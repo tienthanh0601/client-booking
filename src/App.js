@@ -23,6 +23,7 @@ import Tickets from './admin-src/pages/Tickets.js'
 import Station from './admin-src/pages/Station.js'
 import HomeAdmin from './admin-src/pages/HomeAdmin.js'
 import Vehicle from './admin-src/pages/Vehicle.js'
+import AddTrip from './admin-src/pages/AddTrip.js'
 
 function App() {
   const dispatch = useDispatch()
@@ -105,6 +106,7 @@ function App() {
             <Route index element={<HomeAdmin />}></Route>
             <Route path="user" element={<User />}></Route>
             <Route path="trip" element={<TripManagement />}></Route>
+            <Route path="add-trip" element={<AddTrip/>}></Route>
             <Route
               path="passengercarcompany"
               element={<PassengerCarCompany />}

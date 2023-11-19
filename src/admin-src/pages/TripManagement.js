@@ -1,5 +1,11 @@
 import React, { Fragment, useRef, useState } from 'react'
-import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SearchOutlined
+} from '@ant-design/icons'
 import Highlighter from 'react-highlight-words'
 import { Button, Input, Popconfirm, Space, Table } from 'antd'
 import ModalListPoint from '../components/ModalListPoint'
@@ -19,6 +25,7 @@ const data = [
 ]
 
 const TripManagement = () => {
+  const navigate = useNavigate()
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef(null)
@@ -30,6 +37,10 @@ const TripManagement = () => {
   const handleReset = (clearFilters) => {
     clearFilters()
     setSearchText('')
+  }
+
+  const handleToAdd = () => {
+    navigate('/admin/add-trip')
   }
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
@@ -235,6 +246,15 @@ const TripManagement = () => {
   ]
   return (
     <div className="">
+      <Button
+        type="primary"
+        size="large"
+        onClick={handleToAdd}
+        style={{ marginBottom: '24px' }}
+        icon={<PlusOutlined />}
+      >
+        Thêm chuyến xe
+      </Button>
       <Table columns={columns} dataSource={data} />
     </div>
   )
