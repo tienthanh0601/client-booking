@@ -55,7 +55,6 @@ const Profile = () => {
       dispatch(
         updateUser({ ...dataUser.data, access_token: dataUser.access_token })
       )
-      
     }
   }, [isSuccess, isError])
 
@@ -69,7 +68,6 @@ const Profile = () => {
       id: user?.id,
       email: user?.email,
       password: user?.password,
-      address: user?.address,
       name: user?.name,
       phone: user?.phone,
       access_token: user?.access_token
@@ -108,7 +106,6 @@ const Profile = () => {
               name: user.name,
               email: user.email,
               phone: user.phone,
-              address: user.address,
               password: user.password
             }}
           >
@@ -145,17 +142,7 @@ const Profile = () => {
             >
               <Input />
             </Form.Item>
-            <Form.Item
-              name="address"
-              label="Address"
-              rules={[
-                {
-                  required: true
-                }
-              ]}
-            >
-              <Input />
-            </Form.Item>
+
             <Form.Item
               name="password"
               label="Password"
@@ -170,7 +157,6 @@ const Profile = () => {
             <Form.Item>
               <Space>
                 <SubmitButton form={form} htmlType="submit" />
-                <Button htmlType="reset">Reset</Button>
               </Space>
             </Form.Item>
           </Form>

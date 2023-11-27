@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { Button, message, Steps, theme } from 'antd'
-import Seats from './Seats'
 import Station from './Station'
 import AddInfoTickets from './AddInfoTickets'
+import SelectSeats from './Seat/SelectSeats'
 const steps = [
   {
     title: 'Chọn chỗ ',
-    content: <Seats />
+    content: <SelectSeats />
   },
   {
     title: 'Điểm đón trả',
@@ -32,10 +32,6 @@ const SelectTrip = () => {
     title: item.title
   }))
   const contentStyle = {
-    lineHeight: '260px',
-    textAlign: 'center',
-    color: token.colorTextTertiary,
-    backgroundColor: token.colorFillAlter,
     borderRadius: token.borderRadiusLG,
     border: `1px dashed ${token.colorBorder}`,
     marginTop: 16

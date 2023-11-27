@@ -1,5 +1,5 @@
 .search-trip {
-  width: 1240px;
+  width: 1200px;
   margin: 42px auto;
   .search-container {
     display: flex;
@@ -111,6 +111,22 @@
         .btn-selects {
           display: flex;
           justify-content: space-between;
+        }
+
+        .select-seat {
+          padding: 32px 46px;
+          .title-seat {
+            font-size: 18px;
+            font-weight: 500;
+          }
+          .note {
+            display: flex;
+            align-items: center;
+            margin-top: 24px;
+            span {
+              margin-left: 16px;
+            }
+          }
         }
       }
     }

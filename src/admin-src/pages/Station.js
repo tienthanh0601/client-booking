@@ -1,27 +1,58 @@
-import React, { Fragment, useState } from 'react'
-import { BsBookmarkPlusFill, BsBusFrontFill } from 'react-icons/bs'
+import React, { Fragment, useEffect, useState } from 'react'
 import {
   Table,
   Input,
   Breadcrumb,
-  Space,
   Popconfirm,
   Button,
   Row,
   Col,
   Form,
   Drawer,
-  Modal
+  message,
+  Select
 } from 'antd'
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import ModalListPoint from '../components/ModalListPoint'
-
+import StationApi from '../../api/StationApi'
+import EditStation from '../components/EditStation'
+import { BsBusFrontFill } from 'react-icons/bs'
+import pointApi from '../../api/PointApi'
+import { data } from '../../data/Provinces'
 const Station = () => {
   const [open, setOpen] = useState(false)
-  const [openPoint, setOpenPoint] = useState(false)
-  const onChange = (pagination, filters, sorter, extra) => {
-    console.log('params', pagination, filters, sorter, extra)
+  const [openModalPoint, setOpenModalPoint] = useState(false)
+  const [isEdit, setIsEdit] = useState(false)
+  const [stationList, setStationList] = useState([])
+  const [station, setStation] = useState('')
+  const [nameStation, setNameStation] = useState('')
+  const [addressStation, setAddressStation] = useState('')
+  const [provinceStation, setProvinceStation] = useState('')
+  const [selectedItems, setSelectedItems] = useState([])
+  const handleChangeName = (e) => {
+    setNameStation(e.target.value)
   }
+  const handleChangeAddress = (e) => {
+    setAddressStation(e.target.value)
+  }
+
+  const handleChangeProvince = (e) => {
+    setProvinceStation(e.target.value)
+  }
+
+  const [pointList, setPointList] = useState([])
+
+  useEffect(() => {
+    const fetchPoint = async () => {
+      const pointList = await pointApi.getAll()
+      setPointList(pointList.data)
+    }
+    fetchPoint()
+  }, [])
+
+  const filteredOptions = pointList?.filter(
+    (o) => !selectedItems?.includes(o._id)
+  )
   const showDrawer = () => {
     setOpen(true)
   }
@@ -29,13 +60,88 @@ const Station = () => {
     setOpen(false)
   }
 
+  const handleToggleModal = (id) => {
+    setOpenModalPoint(() => !openModalPoint)
+    setStation(id)
+    const data = stationList.find((x) => x._id === id)
+    if (data !== undefined) setSelectedItems(data.points)
+    else setSelectedItems([])
+  }
+
+  const handleEditStation = async (id) => {
+    const getStationId = await StationApi.get(id)
+    setStation(getStationId.data)
+    setNameStation(getStationId.data.name)
+    setAddressStation(getStationId.data.address)
+    setIsEdit(true)
+  }
+  const handleUpdate = async () => {
+    const data = {
+      id: station._id,
+      name: nameStation,
+      address: addressStation
+    }
+    await StationApi.update(data)
+    const stationList = await StationApi.getAll()
+    setStationList(stationList.data)
+    message.success('Cập nhật thông tin bến xe thành công')
+  }
+  const handleCloseEdit = () => {
+    setIsEdit(false)
+    setNameStation('')
+    setAddressStation('')
+    setStation()
+  }
+  useEffect(() => {
+    const fetchStation = async () => {
+      const stationList = await StationApi.getAll()
+      setStationList(stationList.data)
+    }
+    fetchStation()
+  }, [])
+
+  const handleAddPoint = async (values) => {
+    const data = {
+      name: values.name,
+      address: values.address,
+      province: values.province
+    }
+    await StationApi.create(data)
+    const stationList = await StationApi.getAll()
+    setStationList(stationList.data)
+    setOpen(false)
+    message.success('Tạo bến xe mới thành công')
+  }
+
+  const handleDelete = async (id) => {
+    await StationApi.remove(id)
+    const stationList = await StationApi.getAll()
+    setStationList(stationList.data)
+    message.success('Xoá bến xe thành công')
+  }
+
+  //
+
+  const cancel = (e) => {
+    console.log(e)
+    message.error('Click on No')
+  }
+
+  const handleUpdatePoint = async () => {
+    const data = {
+      id: station,
+      points: selectedItems
+    }
+    await StationApi.update(data)
+    setOpenModalPoint(false)
+    const stationList = await StationApi.getAll()
+    setStationList(stationList.data)
+  }
+  //
   const columns = [
     {
       title: 'Tên Bến',
       dataIndex: 'name',
-
-      // specify the condition of filtering result
-      // here is that finding the name started with `value`
       onFilter: (value, record) => record.name.indexOf(value) === 0,
       sorter: (a, b) => a.name.length - b.name.length,
       sortDirections: ['descend']
@@ -45,12 +151,24 @@ const Station = () => {
       dataIndex: 'address'
     },
     {
+      title: 'Thành phố',
+      dataIndex: 'province'
+    },
+    {
       title: 'Các điểm đón / trả',
-      render: () => {
+      render: (text, item) => {
         return (
           <Fragment>
             <div>
-              <ModalListPoint />
+              <button
+                className="btn-point"
+                onClick={() => {
+                  handleToggleModal(item._id)
+                }}
+              >
+                <BsBusFrontFill className="icon-point" />
+                Điểm đón / Dừng
+              </button>
             </div>
           </Fragment>
         )
@@ -65,27 +183,22 @@ const Station = () => {
             <div className="btn-action">
               <button
                 className="mr-3"
-                // onClick={() => {
-                //   dispatch({
-                //     type: SET_MODAL,
-                //     title: 'EDIT USER',
-                //     content: <EditUser id={item.id} />,
-                //     width: 600
-                //   })
-                // }}
+                onClick={() => {
+                  handleEditStation(item._id)
+                }}
               >
                 <EditOutlined className="btn-edit" />
               </button>
+
               <Popconfirm
-                placement="topLeft"
-                title={'Bạn có muốn xóa tài khoản này'}
-                // onConfirm={() => {
-                //   dispatch(deleteUserAction(item.id))
-                // }}
-                // okText="Yes"
-                // cancelText="No"
+                title="Delete the task"
+                description="Are you sure to delete this task?"
+                onCancel={cancel}
+                onConfirm={() => handleDelete(item._id)}
+                okText="Yes"
+                cancelText="No"
               >
-                <button className="text-red-700">
+                <button>
                   <DeleteOutlined className="btn-delete" />
                 </button>
               </Popconfirm>
@@ -95,13 +208,11 @@ const Station = () => {
       }
     }
   ]
-  const data = [
-    {
-      key: '1',
-      name: 'Bến xe Đà Nẵng',
-      address: '32 Tố Hữu , Hải Châu Đà Nẵng'
-    }
-  ]
+
+  const provices = data.map((item) => ({
+    value: `${item.name}`,
+    label: `${item.name}`
+  }))
 
   return (
     <div className="wrapper-vehicle">
@@ -136,16 +247,8 @@ const Station = () => {
               paddingBottom: 80
             }
           }}
-          extra={
-            <Space>
-              <Button onClick={onClose}>Cancel</Button>
-              <Button onClick={onClose} type="primary">
-                Submit
-              </Button>
-            </Space>
-          }
         >
-          <Form layout="vertical" hideRequiredMark>
+          <Form layout="vertical" onFinish={handleAddPoint} hideRequiredMark>
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
@@ -176,12 +279,56 @@ const Station = () => {
                 </Form.Item>
               </Col>
             </Row>
+            <Row>
+              <Col span={12}>
+                <Form.Item
+                  name="province"
+                  label="Name Province"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please enter Province'
+                    }
+                  ]}
+                >
+                  <Select
+                    options={provices}
+                    placeholder="select Province"
+                  ></Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Button type="primary" htmlType="submit">
+              Tạo Bến Xe
+            </Button>
           </Form>
         </Drawer>
       </div>
       <div className="list-user">
-        <Table columns={columns} dataSource={data} onChange={onChange} />;
+        <Table columns={columns} dataSource={stationList} />;
       </div>
+      {isEdit && (
+        <EditStation
+          handleUpdate={handleUpdate}
+          isShowModal={isEdit}
+          handleChangeName={handleChangeName}
+          handleChangeAddress={handleChangeAddress}
+          handleChangeProvince={handleChangeProvince}
+          name={nameStation}
+          province={provinceStation}
+          address={addressStation}
+          handleCloseEdit={handleCloseEdit}
+        />
+      )}
+      <ModalListPoint
+        isOpen={openModalPoint}
+        handleToogle={handleToggleModal}
+        selectedItems={selectedItems}
+        setSelectedItems={setSelectedItems}
+        filteredOptions={filteredOptions}
+        handleUpdatePoint={handleUpdatePoint}
+      />
+      {station?.id !== '' && <EditStation />}
     </div>
   )
 }

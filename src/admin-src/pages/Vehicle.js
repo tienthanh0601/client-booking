@@ -1,4 +1,5 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
+import '../../scss/vehicle.scss'
 import {
   Table,
   Input,
@@ -10,104 +11,162 @@ import {
   Col,
   Form,
   Select,
-  Drawer
+  Drawer,
+  message,
+  Modal
 } from 'antd'
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  MinusCircleOutlined
+} from '@ant-design/icons'
 import { Option } from 'antd/es/mentions'
-const columns = [
-  {
-    title: 'Tên Xe',
-    dataIndex: 'name',
+import vehicleApi from '../../api/VehicleApi'
+import { BsBusFrontFill } from 'react-icons/bs'
+import SeatBooked from '../../components/Seat/SeatBooked'
+import Seat1 from '../../components/Seat/Seat1'
+import SeatBooking from '../../components/Seat/SeatBooking'
+import DetailsSeat from '../components/DetailsSeat'
 
-    // specify the condition of filtering result
-    // here is that finding the name started with `value`
-    onFilter: (value, record) => record.name.indexOf(value) === 0,
-    sorter: (a, b) => a.name.length - b.name.length,
-    sortDirections: ['descend']
-  },
-  {
-    title: 'Số tầng',
-    dataIndex: 'floor'
-  },
-  {
-    title: 'Loại xe',
-    dataIndex: 'type',
-    filters: [
-      {
-        text: 'Giường nằm',
-        value: 'Giường nằm'
-      },
-      {
-        text: 'Limousine',
-        value: 'Limousine'
-      }
-    ],
-    onFilter: (value, record) => record.type.startsWith(value),
-    filterSearch: true
-  },
-  {
-    title: 'Số ghế',
-    dataIndex: 'totalSeat'
-  },
-  {
-    title: 'Action',
-
-    render: (text, item) => {
-      return (
-        <Fragment>
-          <div className="btn-action">
-            <button
-              className="mr-3"
-              // onClick={() => {
-              //   dispatch({
-              //     type: SET_MODAL,
-              //     title: 'EDIT USER',
-              //     content: <EditUser id={item.id} />,
-              //     width: 600
-              //   })
-              // }}
-            >
-              <EditOutlined className="btn-edit" />
-            </button>
-            <Popconfirm
-              placement="topLeft"
-              title={'Bạn có muốn xóa tài khoản này'}
-              // onConfirm={() => {
-              //   dispatch(deleteUserAction(item.id))
-              // }}
-              // okText="Yes"
-              // cancelText="No"
-            >
-              <button className="text-red-700">
-                <DeleteOutlined className="btn-delete" />
-              </button>
-            </Popconfirm>
-          </div>
-        </Fragment>
-      )
-    }
-  }
-]
-const data = [
-  {
-    key: '1',
-    name: 'Xe số 1',
-    type: 'Limousine',
-    floor: 1,
-    totalSeat: 24
-  }
-]
-const onChange = (pagination, filters, sorter, extra) => {
-  console.log('params', pagination, filters, sorter, extra)
-}
 const Vehicle = () => {
   const [open, setOpen] = useState(false)
+  const [vehicleList, setVehicleList] = useState([])
+
+  const handleDelete = async (id) => {
+    await vehicleApi.remove(id)
+    const vehicleList = await vehicleApi.getAll()
+    setVehicleList(vehicleList.data)
+    message.success('Xoá xe thành công')
+  }
+
+  useEffect(() => {
+    const fetchVehicle = async () => {
+      const vehicleList = await vehicleApi.getAll()
+      setVehicleList(vehicleList.data)
+    }
+    fetchVehicle()
+  }, [])
+
+  const handleCreate = async (values) => {
+    const data = {
+      name: values.name,
+      type: values.type,
+      floor: values.floor,
+      totalSeat: values.totalSeat
+    }
+    console.log(data)
+    await vehicleApi.create(data)
+    const vehicleList = await vehicleApi.getAll()
+    setVehicleList(vehicleList.data)
+    setOpen(false)
+    message.success('Tạo xe mới thành công')
+  }
+
   const showDrawer = () => {
     setOpen(true)
   }
   const onClose = () => {
     setOpen(false)
   }
+
+  const cancel = (e) => {
+    console.log(e)
+    message.error('Click on No')
+  }
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const showModal = () => {
+    setIsModalOpen(true)
+  }
+  const handleOk = () => {
+    setIsModalOpen(false)
+  }
+  const handleCancel = () => {
+    setIsModalOpen(false)
+  }
+
+  const columns = [
+    {
+      title: 'Tên Xe',
+      dataIndex: 'name',
+      onFilter: (value, record) => record.name.indexOf(value) === 0,
+      sorter: (a, b) => a.name.length - b.name.length,
+      sortDirections: ['descend']
+    },
+    // {
+    //   title: 'Số tầng',
+    //   dataIndex: 'floor'
+    // },
+    {
+      title: 'Loại xe',
+      dataIndex: 'type',
+      filters: [
+        {
+          text: 'Giường nằm',
+          value: 'Giường nằm'
+        },
+        {
+          text: 'Limousine',
+          value: 'Limousine'
+        }
+      ],
+      onFilter: (value, record) => record.type.startsWith(value),
+      filterSearch: true
+    },
+    {
+      title: 'Chi tiết ghế',
+      render: (text, item) => {
+        return (
+          <Fragment>
+            <div>
+              <Button className="btn-point" type="primary" onClick={showModal}>
+                <BsBusFrontFill className="icon-point" />
+                Xem ghế
+              </Button>
+              <Modal
+                width={800}
+                title="Chi tiết ghế"
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+              >
+                <DetailsSeat vehicleId={item._id} />
+              </Modal>
+            </div>
+          </Fragment>
+        )
+      }
+    },
+    {
+      title: 'Action',
+
+      render: (text, item) => {
+        return (
+          <Fragment>
+            <div className="btn-action">
+              <button className="mr-3" onClick={() => {}}>
+                <EditOutlined className="btn-edit" />
+              </button>
+              <Popconfirm
+                title="Delete the task"
+                description="Are you sure to delete this task?"
+                onCancel={cancel}
+                onConfirm={() => handleDelete(item._id)}
+                okText="Yes"
+                cancelText="No"
+              >
+                <button>
+                  <DeleteOutlined className="btn-delete" />
+                </button>
+              </Popconfirm>
+            </div>
+          </Fragment>
+        )
+      }
+    }
+  ]
+
   return (
     <div className="wrapper-vehicle">
       <Breadcrumb
@@ -144,13 +203,10 @@ const Vehicle = () => {
           extra={
             <Space>
               <Button onClick={onClose}>Cancel</Button>
-              <Button onClick={onClose} type="primary">
-                Submit
-              </Button>
             </Space>
           }
         >
-          <Form layout="vertical" hideRequiredMark>
+          <Form layout="vertical" onFinish={handleCreate}>
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
@@ -198,8 +254,8 @@ const Vehicle = () => {
                   ]}
                 >
                   <Select placeholder="Please select floor">
-                    <Option value="xiao">1</Option>
-                    <Option value="mao">2</Option>
+                    <Option value="1">1</Option>
+                    <Option value="2">2</Option>
                   </Select>
                 </Form.Item>
               </Col>
@@ -218,11 +274,14 @@ const Vehicle = () => {
                 </Form.Item>
               </Col>
             </Row>
+            <Button type="primary" htmlType="submit">
+              Tạo xe mới
+            </Button>
           </Form>
         </Drawer>
       </div>
       <div className="list-user">
-        <Table columns={columns} dataSource={data} onChange={onChange} />;
+        <Table columns={columns} dataSource={vehicleList} />
       </div>
     </div>
   )

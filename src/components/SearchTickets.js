@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Select, DatePicker, Space } from 'antd'
 import { BsFillRecordCircleFill, BsFillCalendarWeekFill } from 'react-icons/bs'
 import { HiLocationMarker } from 'react-icons/hi'
 import '../scss/searchticket.scss'
 import { useNavigate } from 'react-router-dom'
+import { data } from '../data/Provinces'
 
 const SearchTickets = () => {
   const navigate = useNavigate()
+
   const handleSearch = () => {
     navigate('/search-trip')
   }
@@ -14,6 +16,12 @@ const SearchTickets = () => {
   // Filter `option.label` match the user type `input`
   const filterOption = (input, option) =>
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+
+  const provices = data.map((item) => ({
+    value: `${item.name}`,
+    label: `${item.name}`
+  }))
+
   return (
     <div className="search-booking">
       <div className="search-form">
@@ -25,25 +33,12 @@ const SearchTickets = () => {
             <span className="station-name">Place of origin</span>
             <Select
               className="select-form"
-              showSearch
-              defaultValue="Hà Nội"
               bordered={false}
+              defaultValue="Hà Nội"
               suffixIcon={null}
+              showSearch
               filterOption={filterOption}
-              options={[
-                {
-                  value: 'jack',
-                  label: 'Hồ Chí Minh'
-                },
-                {
-                  value: 'Hà Nội',
-                  label: 'Hà Nội'
-                },
-                {
-                  value: 'tom',
-                  label: 'Quảng Ngãi'
-                }
-              ]}
+              options={provices}
             />
           </div>
         </div>
@@ -60,44 +55,7 @@ const SearchTickets = () => {
               bordered={false}
               suffixIcon={null}
               filterOption={filterOption}
-              options={[
-                {
-                  value: 'jack',
-                  label: 'Hồ Chí Minh'
-                },
-                {
-                  value: 'Hà Nội',
-                  label: 'Hà Nội'
-                },
-                {
-                  value: 'tom',
-                  label: 'Quảng Ngãi'
-                },
-                {
-                  value: '1',
-                  label: 'Lâm Đồng'
-                },
-                {
-                  value: '2',
-                  label: 'Đà Lạt'
-                },
-                {
-                  value: '3',
-                  label: 'Quy Nhơn'
-                },
-                {
-                  value: '4',
-                  label: 'Vinh'
-                },
-                {
-                  value: '5',
-                  label: 'Quảng Ninh'
-                },
-                {
-                  value: '7',
-                  label: 'Huế'
-                }
-              ]}
+              options={provices}
             />
           </div>
         </div>
