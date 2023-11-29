@@ -26,6 +26,7 @@ import Vehicle from './admin-src/pages/Vehicle.js'
 import AddTrip from './admin-src/pages/AddTrip.js'
 import Point from './admin-src/pages/Point.js'
 import CreateTrip from './admin-src/components/CreateTrip.js'
+import Province from './admin-src/pages/Province.js'
 
 function App() {
   const dispatch = useDispatch()
@@ -117,6 +118,7 @@ function App() {
             <Route path="tickets" element={<Tickets />}></Route>
             <Route path="station" element={<Station />}></Route>
             <Route path="point" element={<Point />}></Route>
+            <Route path="province" element={<Province />}></Route>
           </Route>
         </Routes>
       </BrowserRouter>

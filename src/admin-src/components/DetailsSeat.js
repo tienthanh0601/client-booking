@@ -14,7 +14,8 @@ import {
   Popover,
   Row,
   Select,
-  Space
+  Space,
+  message
 } from 'antd'
 import { Option } from 'antd/es/mentions'
 import React, { useEffect, useState } from 'react'
@@ -22,25 +23,32 @@ import Seat from './Seat'
 import '../../scss/vehicle.scss'
 import seatApi from '../../api/seatApi'
 
-const DetailsSeat = (vehicleId) => {
+const DetailsSeat = ({ vehicleId }) => {
   const [open, setOpen] = useState(false)
   const [seatList, setSeatList] = useState([])
+  const [seat, setSeat] = useState([])
+  // const [selectedItems, setSelectedItems] = useState([])
+  // const [VehicleList, setVehicleList] = useState([])
 
   useEffect(() => {
     const fetchSeat = async () => {
-      const seatList = await seatApi.getAll()
-      console.log(seatList)
+      const seatList = await seatApi.getSeatByVehicle(vehicleId)
+      console.log('list', seatList)
       setSeatList(seatList.data)
     }
     fetchSeat()
-  }, [])
+  }, [vehicleId])
 
-  const handleAddSeat = (values, vehicleId) => {
+  const handleAddSeat = async (values) => {
     const data = {
       vehicle: vehicleId,
-      vehicle: values.vehicle
+      name: values.name,
+      type: values.type,
+      price: values.price
     }
-    console.log('data :', data)
+    await seatApi.create(data)
+
+    message.success('Tạo ghế mới thành công')
   }
 
   const showDrawer = () => {
@@ -204,7 +212,7 @@ const DetailsSeat = (vehicleId) => {
           <div />
         </div>
         <div className="seat-template">
-          {seats.map((seat) => (
+          {seatList.map((seat) => (
             <Popover
               style={{ margin: '20px' }}
               placement="top"
@@ -212,7 +220,7 @@ const DetailsSeat = (vehicleId) => {
               title={`Ghế : ${seat.name} + ${seat.price} VND`}
             >
               <button
-                key={seat.id}
+                key={seat._id}
                 variant={seat.isBooked ? 'cursor: pointer' : 'outlined'}
                 color={seat.isBooked ? 'error' : 'primary'}
                 disabled={seat.isBooked}
@@ -234,75 +242,50 @@ const DetailsSeat = (vehicleId) => {
           onFinish={handleAddSeat}
           hideRequiredMark
         >
-          <Form.List name=''>
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map(({ key, name, ...restField }) => (
-                  <Space
-                    key={key}
-                    style={{ display: 'flex', marginBottom: 8 }}
-                    align="baseline"
-                  >
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'name']}
-                      rules={[
-                        { required: true, message: 'Missing seats name' }
-                      ]}
-                    >
-                      <Input placeholder="Tên Ghế" />
-                    </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'price']}
-                      rules={[{ required: true, message: 'Missing price' }]}
-                    >
-                      <Input placeholder="Giá Ghế" type="number" min={50000} />
-                    </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'floor']}
-                      rules={[{ required: true, message: 'Missing floor' }]}
-                    >
-                      <Select placeholder="Tầng" style={{ width: 130 }}>
-                        <Option key={'1'} value={1}>
-                          Tầng 1
-                        </Option>
-                        <Option key={'2'} value={2}>
-                          Tầng 2
-                        </Option>
-                      </Select>
-                    </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'type']}
-                      rules={[{ required: true, message: 'Missing type' }]}
-                    >
-                      <Select placeholder="Loại Ghế" style={{ width: 130 }}>
-                        <Option key={'bed'} value={'bed'}>
-                          Ghế Giường Nằm
-                        </Option>
-                        <Option key={'seat'} value={'seat'}>
-                          Ghế Thường
-                        </Option>
-                      </Select>
-                    </Form.Item>
-                    <MinusCircleOutlined onClick={() => remove(name)} />
-                  </Space>
-                ))}
-                <Form.Item>
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    block
-                    icon={<PlusOutlined />}
-                  >
-                    Thêm
-                  </Button>
-                </Form.Item>
-              </>
-            )}
-          </Form.List>
+          <Row>
+            <Col span={6}>
+              <Form.Item
+                name="name"
+                label="Name"
+                rules={[
+                  {
+                    required: true
+                  }
+                ]}
+              >
+                <Input></Input>
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item
+                name="price"
+                label="Price"
+                rules={[
+                  {
+                    required: true
+                  }
+                ]}
+              >
+                <Input></Input>
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item
+                name="type"
+                label="Type"
+                rules={[
+                  {
+                    required: true
+                  }
+                ]}
+              >
+                <Select placeholder="Select a option and change input text above">
+                  <Option value="Giường nằm">Giường nằm</Option>
+                  <Option value="Limousine">Limousine</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Form.Item className="text-center">
             <Button type="primary" htmlType="submit">

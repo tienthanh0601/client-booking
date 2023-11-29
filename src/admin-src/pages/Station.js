@@ -19,6 +19,7 @@ import EditStation from '../components/EditStation'
 import { BsBusFrontFill } from 'react-icons/bs'
 import pointApi from '../../api/PointApi'
 import { data } from '../../data/Provinces'
+import provinceApi from '../../api/provinceApi'
 const Station = () => {
   const [open, setOpen] = useState(false)
   const [openModalPoint, setOpenModalPoint] = useState(false)
@@ -29,6 +30,8 @@ const Station = () => {
   const [addressStation, setAddressStation] = useState('')
   const [provinceStation, setProvinceStation] = useState('')
   const [selectedItems, setSelectedItems] = useState([])
+  const [provinceList, setProvinceList] = useState([])
+
   const handleChangeName = (e) => {
     setNameStation(e.target.value)
   }
@@ -49,6 +52,20 @@ const Station = () => {
     }
     fetchPoint()
   }, [])
+
+  useEffect(() => {
+    const fetchProvince = async () => {
+      const provinceList = await provinceApi.getAll()
+      setProvinceList(provinceList.data)
+    }
+    fetchProvince()
+  }, [])
+
+  const renderPickProvince = () => {
+    return provinceList.map((item, index) => {
+      return { label: `${item.name}`, value: item._id }
+    })
+  }
 
   const filteredOptions = pointList?.filter(
     (o) => !selectedItems?.includes(o._id)
@@ -209,11 +226,6 @@ const Station = () => {
     }
   ]
 
-  const provices = data.map((item) => ({
-    value: `${item.name}`,
-    label: `${item.name}`
-  }))
-
   return (
     <div className="wrapper-vehicle">
       <Breadcrumb
@@ -292,7 +304,7 @@ const Station = () => {
                   ]}
                 >
                   <Select
-                    options={provices}
+                    options={renderPickProvince()}
                     placeholder="select Province"
                   ></Select>
                 </Form.Item>

@@ -73,6 +73,11 @@ const Admin = () => {
                 key: '/admin/point',
                 icon: <UploadOutlined />,
                 label: 'Quản lý điểm'
+              },
+              {
+                key: '/admin/province',
+                icon: <UploadOutlined />,
+                label: 'Quản lý thành phố'
               }
             ]}
           />

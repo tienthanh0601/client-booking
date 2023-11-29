@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Form, Input, Modal, Select, Space } from 'antd'
 import { Option } from 'antd/es/mentions'
 import '../../scss/edituser.scss'
 import { data } from '../../data/Provinces'
+import provinceApi from '../../api/provinceApi'
 const EditStation = ({
   handleUpdate,
   isShowModal,
@@ -14,10 +15,21 @@ const EditStation = ({
   address,
   handleCloseEdit
 }) => {
-  const provice = data.map((item) => ({
-    value: `${item.name}`,
-    label: `${item.name}`
-  }))
+  const [provinceList, setProvinceList] = useState([])
+
+  useEffect(() => {
+    const fetchProvince = async () => {
+      const provinceList = await provinceApi.getAll()
+      setProvinceList(provinceList.data)
+    }
+    fetchProvince()
+  }, [])
+
+  const renderPickProvince = () => {
+    return provinceList.map((item, index) => {
+      return { label: `${item.name}`, value: item._id }
+    })
+  }
   const handleOk = () => {
     handleUpdate()
     handleCloseEdit()
@@ -50,7 +62,7 @@ const EditStation = ({
             value={province}
             onChange={handleChangeProvince}
           >
-            {data.map((item) => (
+            {renderPickProvince().map((item) => (
               <option value={item.name}>{item.name}</option>
             ))}
           </select>

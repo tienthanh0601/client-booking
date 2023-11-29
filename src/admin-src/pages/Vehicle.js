@@ -76,14 +76,17 @@ const Vehicle = () => {
   }
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const showModal = () => {
+  const [vehicleId, setVehicleId] = useState('')
+  const showModal = (id) => {
     setIsModalOpen(true)
+    setVehicleId(id)
   }
   const handleOk = () => {
     setIsModalOpen(false)
   }
   const handleCancel = () => {
     setIsModalOpen(false)
+    setVehicleId('')
   }
 
   const columns = [
@@ -120,7 +123,11 @@ const Vehicle = () => {
         return (
           <Fragment>
             <div>
-              <Button className="btn-point" type="primary" onClick={showModal}>
+              <Button
+                className="btn-point"
+                type="primary"
+                onClick={() => showModal(item._id)}
+              >
                 <BsBusFrontFill className="icon-point" />
                 Xem ghế
               </Button>
@@ -131,7 +138,7 @@ const Vehicle = () => {
                 onOk={handleOk}
                 onCancel={handleCancel}
               >
-                <DetailsSeat vehicleId={item._id} />
+                <DetailsSeat vehicleId={vehicleId} />
               </Modal>
             </div>
           </Fragment>

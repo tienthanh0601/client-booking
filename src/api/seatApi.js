@@ -5,7 +5,10 @@ const seatApi = {
     const url = '/seat/all'
     return axiosClient.get(url, { params })
   },
-
+  getSeatByVehicle(vehicleId) {
+    const url = `/seat/seatByVehicle/${vehicleId}`
+    return axiosClient.get(url)
+  },
   get(id) {
     const url = `/seat/details/${id}`
     return axiosClient.get(url)
