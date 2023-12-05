@@ -1,67 +1,40 @@
-import React, { Fragment, useRef, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
 import Highlighter from 'react-highlight-words'
 import { Button, Input, Popconfirm, Space, Table } from 'antd'
+import ticketApi from '../../api/ticketApi'
+import pointApi from '../../api/PointApi'
 
-const data = [
-  {
-    key: '1',
-    id: '65466bb4dcf72ebeac597f9c',
-    name: 'John Brown',
-    phone: 32347895,
-    from: 'New York',
-    to: 'New York',
-    day: '22/10/2023',
-    totalAmount: '400.000',
-    numberSeat: 'A1 , A2',
-    point: 'Quảng Ngãi - Gia Lai',
-    status: 'Hết hạn'
-  },
-  {
-    key: '1',
-    id: '65466bb4dcf72ebeac597f9c',
-    name: 'John Brown',
-    phone: 32347895,
-    from: 'New York',
-    to: 'New York',
-    day: '22/10/2023',
-    totalAmount: '400.000',
-    numberSeat: 'A1 , A2',
-    point: 'Quảng Ngãi - Gia Lai',
-    status: 'Hết hạn'
-  },
-  {
-    key: '1',
-    id: '65466bb4dcf72ebeac597f9c',
-    name: 'John Brown',
-    phone: 32347895,
-    from: 'New York',
-    to: 'New York',
-    day: '22/10/2023',
-    totalAmount: '400.000',
-    numberSeat: 'A1 , A2',
-    point: 'Quảng Ngãi - Gia Lai',
-    status: 'Hết hạn'
-  },
-  {
-    key: '1',
-    id: '65466bb4dcf72ebeac597f9c',
-    name: 'John Brown',
-    phone: 32347895,
-    from: 'New York',
-    to: 'New York',
-    day: '22/10/2023',
-    totalAmount: '400.000',
-    numberSeat: 'A1 , A2',
-    point: 'Quảng Ngãi - Gia Lai',
-    status: 'Hết hạn'
-  }
-]
+const getPointByID = (id, points) => {
+  const find = points.find((x) => x._id === id)
+  return find !== undefined ? find.name : ''
+}
 
 const Tickets = () => {
+  // lấy tat cả tieket ra
+  const [ticketList, setTicketList] = useState([])
+  const [pointList, setPointList] = useState([])
+  // tát cả point
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef(null)
+
+  useEffect(() => {
+    const fetchTicket = async () => {
+      const pointList = await ticketApi.getAll()
+      setTicketList(pointList.data)
+    }
+    fetchTicket()
+  }, [])
+
+  useEffect(() => {
+    const fetchPoint = async () => {
+      const points = await pointApi.getAll()
+      setPointList(points.data)
+    }
+    fetchPoint()
+  }, [])
+
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm()
     setSearchText(selectedKeys[0])
@@ -176,8 +149,8 @@ const Tickets = () => {
   const columns = [
     {
       title: 'Mã vé',
-      dataIndex: 'id',
-      key: 'name',
+      dataIndex: '_id',
+      key: '_id',
       width: '10%',
       ...getColumnSearchProps('name')
     },
@@ -198,14 +171,21 @@ const Tickets = () => {
       sortDirections: ['descend', 'ascend']
     },
     {
-      title: 'From',
-      dataIndex: 'from',
+      title: 'Email',
+      dataIndex: 'email',
       key: 'from',
       width: '10%'
     },
     {
+      title: 'From',
+      dataIndex: 'pickedPoint',
+      key: 'from',
+      width: '10%',
+      render: (text, record) => getPointByID(record.pickedPoint, pointList).name
+    },
+    {
       title: 'To',
-      dataIndex: 'to',
+      dataIndex: 'droppedPoint',
       key: 'to',
       width: '10%'
     },
@@ -217,14 +197,14 @@ const Tickets = () => {
     },
     {
       title: 'Total Amount',
-      dataIndex: 'totalAmount',
-      key: 'totalAmount',
+      dataIndex: 'total',
+      key: 'total',
       width: '10%'
     },
     {
       title: 'Number Seats',
-      dataIndex: 'numberSeat',
-      key: 'numberSeat',
+      dataIndex: 'seatId',
+      key: 'seatId',
       width: '10%'
     },
     {
@@ -280,7 +260,26 @@ const Tickets = () => {
   ]
   return (
     <div className="">
-      <Table columns={columns} dataSource={data} />
+      <Table columns={columns} dataSource={ticketList} />
+      {/* <table>
+        <tr>
+          <th>Mã ghế</th>
+          <th>name</th>
+          <th>Email</th>
+          <th>phone</th>
+          <th>Gia tiền</th>
+          <th>Ghế ngồi</th>
+          <th>điểm đón / Trả</th>
+        </tr>
+
+        <tr>
+          <td>1</td>
+          <td>2</td>
+          <td>3</td>
+          <td></td>
+          <td>3</td>
+        </tr>
+      </table> */}
     </div>
   )
 }

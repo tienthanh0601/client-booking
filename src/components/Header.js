@@ -65,7 +65,7 @@ const Header = () => {
           <nav className="header-nav">
             <ul className="list-item-big">
               <li className="nav-item">
-                <Link to={'/about'}>ABOUT</Link>
+                <Link to={'/search-trip'}>Đặt vé</Link>
               </li>
               <li className="nav-item">
                 <Link to={'/contact'}>CONTACT</Link>

@@ -50,7 +50,6 @@ const Home = () => {
             src="https://229a2c9fe669f7b.cmccloud.com.vn/images/banner-main-vi.jpg"
             alt="banner"
           />
-          <SearchTickets />
         </div>
       </div>
       <div className="home-wrapper-2">
@@ -95,9 +94,7 @@ const Home = () => {
           </Slider>
         </div>
       </div>
-      <div className="home-wrapper-4">
-        
-      </div>
+      <div className="home-wrapper-4"></div>
       <div className="home-wrapper-3">
         <div className="box-marquee">
           <h1>TIN TỨC LIÊN QUAN</h1>

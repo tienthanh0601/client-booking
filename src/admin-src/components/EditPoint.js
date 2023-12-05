@@ -1,4 +1,4 @@
-import React, { } from 'react'
+import React from 'react'
 import '../../scss/edituser.scss'
 import { Modal } from 'antd'
 const EditPoint = ({
@@ -17,7 +17,7 @@ const EditPoint = ({
   return (
     <div>
       <Modal
-        title="Edit Station"
+        title="Edit Point"
         open={isShowModal}
         onOk={handleOk}
         onCancel={handleCloseEdit}

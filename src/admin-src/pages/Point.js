@@ -14,6 +14,7 @@ import {
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import EditStation from '../components/EditStation'
 import pointApi from '../../api/PointApi'
+import EditPoint from '../components/EditPoint'
 
 const Point = () => {
   const [open, setOpen] = useState(false)
@@ -219,7 +220,7 @@ const Point = () => {
         <Table columns={columns} dataSource={pointList} />;
       </div>
       {isEdit && (
-        <EditStation
+        <EditPoint
           handleUpdate={handleUpdate}
           isShowModal={isEdit}
           handleChangeName={handleChangeName}

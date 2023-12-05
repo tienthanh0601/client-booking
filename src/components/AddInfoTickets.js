@@ -1,51 +1,8 @@
-import React, { useState } from 'react'
-import {
-  AutoComplete,
-  Button,
-  Cascader,
-  Checkbox,
-  Col,
-  Form,
-  Input,
-  InputNumber,
-  Row,
-  Select
-} from 'antd'
+import React from 'react'
+import { Button, Form, Input, Select } from 'antd'
+import { useSelector } from 'react-redux'
 const { Option } = Select
-const residences = [
-  {
-    value: 'zhejiang',
-    label: 'Zhejiang',
-    children: [
-      {
-        value: 'hangzhou',
-        label: 'Hangzhou',
-        children: [
-          {
-            value: 'xihu',
-            label: 'West Lake'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    value: 'jiangsu',
-    label: 'Jiangsu',
-    children: [
-      {
-        value: 'nanjing',
-        label: 'Nanjing',
-        children: [
-          {
-            value: 'zhonghuamen',
-            label: 'Zhong Hua Men'
-          }
-        ]
-      }
-    ]
-  }
-]
+
 const formItemLayout = {
   labelCol: {
     xs: {
@@ -64,20 +21,17 @@ const formItemLayout = {
     }
   }
 }
-const tailFormItemLayout = {
-  wrapperCol: {
-    xs: {
-      span: 24,
-      offset: 0
-    },
-    sm: {
-      span: 16,
-      offset: 8
-    }
-  }
-}
-const AddInfoTickets = () => {
+
+const AddInfoTickets = ({
+  email,
+  name,
+  phone,
+  handleChangeEmail,
+  handleChangeName,
+  handleChangePhone
+}) => {
   const [form] = Form.useForm()
+
   const onFinish = (values) => {
     console.log('Received values of form: ', values)
   }
@@ -100,6 +54,9 @@ const AddInfoTickets = () => {
       name="checkinfo"
       onFinish={onFinish}
       initialValues={{
+        name: name,
+        phone: phone,
+        email: email,
         prefix: '84'
       }}
       style={{
@@ -110,6 +67,8 @@ const AddInfoTickets = () => {
       <Form.Item
         name="email"
         label="E-mail"
+        onChange={handleChangeEmail}
+        value={email}
         rules={[
           {
             type: 'email',
@@ -125,8 +84,9 @@ const AddInfoTickets = () => {
       </Form.Item>
 
       <Form.Item
-        name="nickname"
+        name="name"
         label="Nickname"
+        onChange={handleChangeName}
         tooltip="What do you want others to call you?"
         rules={[
           {
@@ -142,6 +102,7 @@ const AddInfoTickets = () => {
       <Form.Item
         name="phone"
         label="Phone Number"
+        onChange={handleChangePhone}
         rules={[
           {
             required: true,
@@ -156,11 +117,11 @@ const AddInfoTickets = () => {
           }}
         />
       </Form.Item>
-      <Form.Item {...tailFormItemLayout}>
+      {/* <Form.Item {...tailFormItemLayout}>
         <Button type="primary" htmlType="submit">
           Register
         </Button>
-      </Form.Item>
+      </Form.Item> */}
     </Form>
   )
 }

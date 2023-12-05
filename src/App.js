@@ -25,7 +25,6 @@ import HomeAdmin from './admin-src/pages/HomeAdmin.js'
 import Vehicle from './admin-src/pages/Vehicle.js'
 import AddTrip from './admin-src/pages/AddTrip.js'
 import Point from './admin-src/pages/Point.js'
-import CreateTrip from './admin-src/components/CreateTrip.js'
 import Province from './admin-src/pages/Province.js'
 
 function App() {

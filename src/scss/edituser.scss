@@ -1,26 +1,29 @@
 .input-edit {
   width: 100%;
   margin: 6px 0;
+  // display: flex;
+  justify-content: space-between;
   span {
-    margin-right: 34px;
+    margin-right: 12px;
   }
   input {
-    width: 100%;
+    width: 80%;
     height: 36px;
-    padding: 6px;
+    padding: 6px 8px;
     font-size: 14px;
     outline: none;
     border-radius: 8px;
+    border: 1px solid #ccc;
   }
   select {
-    width: 100%;
+    width: 80%;
     height: 36px;
-    padding: 6px;
+    padding: 6px 8px;
     font-size: 14px;
     outline: none;
     border-radius: 8px;
-    .option {
-        height: 36px;
+    .select-selected {
+      background-color: DodgerBlue;
     }
   }
 }

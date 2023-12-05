@@ -3,9 +3,8 @@ import React from 'react'
 import SeatBooked from './SeatBooked'
 import SeatBooking from './SeatBooking'
 import Seat from '../../admin-src/components/Seat'
-import Wheel from './Wheel'
 
-const SelectSeats = () => {
+const SelectSeats = ({ seats, selectedSeats, toggleSeat }) => {
   return (
     <div className="select-seat">
       <Row>
@@ -25,7 +24,11 @@ const SelectSeats = () => {
           </div>
         </Col>
         <Col span={14}>
-          <SeatBooking />
+          <SeatBooking
+            seats={seats}
+            selectedSeats={selectedSeats}
+            toggleSeat={toggleSeat}
+          />
         </Col>
       </Row>
     </div>

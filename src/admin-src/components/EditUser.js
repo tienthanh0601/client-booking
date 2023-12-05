@@ -45,11 +45,11 @@ const EditUser = ({
         <div className="input-edit">
           <span>Role :</span>
           <select value={isAdmin} onChange={handleChangeIsAdmin} name="isAdmin">
-            <option className="option-value" value="user">
-              user
+            <option style={{ height: '50px', padding: '16px' }} value="user">
+              User
             </option>
-            <option className="option-value" value="admin">
-              admin
+            <option style={{ height: '36px' }} value="admin">
+              Admin
             </option>
           </select>
         </div>

@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import { Breadcrumb, Button, Popconfirm, Table } from 'antd'
+import { Breadcrumb, Button, Popconfirm, Table, message } from 'antd'
 import ModalListPoint from '../components/ModalListPoint'
 import { BsBusFrontFill } from 'react-icons/bs'
 import tripApi from '../../api/tripApi'
@@ -45,10 +45,22 @@ const TripManagement = () => {
       setTripList(updatedTripList)
     }
     fetchTrip()
-  }, [])
+  }, [tripList])
+
+  const handleDelete = async (id) => {
+    await tripApi.remove(id)
+    const tripList = await tripApi.getAll()
+    setTripList(tripList.data)
+    message.success('Xoá chuyến xe thành công')
+  }
 
   const handleToAdd = () => {
     navigate('/admin/add-trip')
+  }
+
+  const cancel = (e) => {
+    console.log(e)
+    message.error('Click on No')
   }
 
   // const getColumnSearchProps = (dataIndex) => ({
@@ -187,7 +199,7 @@ const TripManagement = () => {
       key: 'status',
       width: '10%'
     },
-    
+
     {
       title: 'Chi tiết vé',
       render: () => {
@@ -216,10 +228,10 @@ const TripManagement = () => {
               <Popconfirm
                 title="Delete the task"
                 description="Are you sure to delete this task?"
-                // onCancel={cancel}
-                // onConfirm={() => handleDelete(item._id)}
+                onConfirm={() => handleDelete(item._id)}
                 okText="Yes"
                 cancelText="No"
+                onCancel={cancel}
               >
                 <button>
                   <DeleteOutlined className="btn-delete" />

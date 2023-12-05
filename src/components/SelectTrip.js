@@ -3,22 +3,63 @@ import { Button, message, Steps, theme } from 'antd'
 import Station from './Station'
 import AddInfoTickets from './AddInfoTickets'
 import SelectSeats from './Seat/SelectSeats'
-const steps = [
-  {
-    title: 'Chọn chỗ ',
-    content: <SelectSeats />
-  },
-  {
-    title: 'Điểm đón trả',
-    content: <Station />
-  },
-  {
-    title: 'Nhập thông tin',
-    content: <AddInfoTickets />
-  }
-]
 
-const SelectTrip = () => {
+const  SelectTrip = ({
+  seats,
+  trip,
+  points,
+  handleSubmitTicket,
+  selectedSeats,
+  toggleSeat,
+  email,
+  name,
+  phone,
+  handleChangePhone,
+  handleChangeName,
+  handleChangeEmail,
+  handleChangePickedPoint,
+  pickedPoint,
+  droppedPoint,
+  handleChangeDroppedPoint
+}) => {
+  const steps = [
+    {
+      title: 'Chọn chỗ ',
+      content: (
+        <SelectSeats
+          seats={seats}
+          selectedSeats={selectedSeats}
+          toggleSeat={toggleSeat}
+        />
+      )
+    },
+    {
+      title: 'Điểm đón trả',
+      content: (
+        <Station
+          trip={trip}
+          points={points}
+          handleChangePickedPoint={handleChangePickedPoint}
+          pickedPoint={pickedPoint}
+          handleChangeDroppedPoint={handleChangeDroppedPoint}
+          droppedPoint={droppedPoint}
+        />
+      )
+    },
+    {
+      title: 'Nhập thông tin',
+      content: (
+        <AddInfoTickets
+          email={email}
+          handleChangeEmail={handleChangeEmail}
+          name={name}
+          handleChangeName={handleChangeName}
+          phone={phone}
+          handleChangePhone={handleChangePhone}
+        />
+      )
+    }
+  ]
   const { token } = theme.useToken()
   const [current, setCurrent] = useState(0)
   const next = () => {
@@ -62,10 +103,7 @@ const SelectTrip = () => {
           </Button>
         )}
         {current === steps.length - 1 && (
-          <Button
-            type="primary"
-            onClick={() => message.success('Processing complete!')}
-          >
+          <Button type="primary" onClick={handleSubmitTicket}>
             Done
           </Button>
         )}

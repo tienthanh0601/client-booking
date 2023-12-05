@@ -10,6 +10,10 @@ const tripApi = {
     const url = `/trip/details/${id}`
     return axiosClient.get(url)
   },
+  search(data) {
+    const url = '/trip/find-trip'
+    return axiosClient.post(url, data)
+  },
   create(data) {
     const url = '/trip/create'
     return axiosClient.post(url, data)

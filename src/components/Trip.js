@@ -5,7 +5,7 @@ import { Button } from 'antd'
 import { DownloadOutlined } from '@ant-design/icons'
 import SelectTrip from './SelectTrip'
 
-const Trip = () => {
+const Trip = ({data}) => {
   const [isShowSelect, setIsShowSelect] = useState(false)
 
   const handleHideShow = () => {

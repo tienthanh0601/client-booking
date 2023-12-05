@@ -17,29 +17,12 @@ import pointApi from '../../api/PointApi'
 import StationApi from '../../api/StationApi'
 import vehicleApi from '../../api/VehicleApi'
 import tripApi from '../../api/tripApi'
-import { data } from '../../data/Provinces'
 const { Option } = Select
 dayjs.extend(customParseFormat)
 
 const AddTrip = () => {
   const [form] = Form.useForm()
   const navigate = useNavigate()
-
-  const handleCreate = async (values) => {
-    const data = {
-      from: values.from,
-      to: values.to,
-      day: values.day,
-      timeStart: values.timeStart,
-      timeEnd: values.timeEnd,
-      vehicle: values.vehicle,
-      points: values.points
-    }
-    console.log(data)
-    await tripApi.create(data)
-    navigate('/admin/trip')
-    message.success('Tạo tài khoản mới thành công')
-  }
 
   const [pointList, setPointList] = useState([])
   const [stationList, setStationList] = useState([])
@@ -69,6 +52,22 @@ const AddTrip = () => {
     fetchVehicle()
   }, [])
 
+  const handleCreate = async (values) => {
+    const data = {
+      from: values.from,
+      to: values.to,
+      day: values.day,
+      timeStart: values.timeStart,
+      timeEnd: values.timeEnd,
+      vehicle: values.vehicle,
+      points: values.points
+    }
+    console.log(data)
+    await tripApi.create(data)
+    navigate('/admin/trip')
+    message.success('Tạo tài khoản mới thành công')
+  }
+
   const renderPickPoint = () => {
     return pointList.map((item, index) => {
       return { label: `${item.name}-${item.address}`, value: item._id }
@@ -86,7 +85,6 @@ const AddTrip = () => {
       return { label: `${item.name}-${item.address}`, value: item._id }
     })
   }
-
 
   return (
     <div className="add-trip">
@@ -127,7 +125,7 @@ const AddTrip = () => {
           </Col>
           <Col className="gutter-row" span={8}>
             <Form.Item
-              name=" vehicle"
+              name="vehicle"
               label="Chọn xe khởi hành"
               rules={[
                 {

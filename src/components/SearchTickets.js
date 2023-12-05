@@ -1,26 +1,28 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Select, DatePicker, Space } from 'antd'
 import { BsFillRecordCircleFill, BsFillCalendarWeekFill } from 'react-icons/bs'
 import { HiLocationMarker } from 'react-icons/hi'
 import '../scss/searchticket.scss'
-import { useNavigate } from 'react-router-dom'
-import { data } from '../data/Provinces'
 
-const SearchTickets = () => {
-  const navigate = useNavigate()
-
-  const handleSearch = () => {
-    navigate('/search-trip')
-  }
-
+const SearchTickets = ({
+  handleChangeDate,
+  handleChangeFrom,
+  handleChangeTo,
+  handleSearch,
+  to,
+  from,
+  provinceList,
+  date,
+}) => {
   // Filter `option.label` match the user type `input`
   const filterOption = (input, option) =>
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
 
-  const provices = data.map((item) => ({
-    value: `${item.name}`,
-    label: `${item.name}`
-  }))
+  const renderProvince = () => {
+    return provinceList.map((item, index) => {
+      return { label: `${item.name}`, value: item._id }
+    })
+  }
 
   return (
     <div className="search-booking">
@@ -34,11 +36,13 @@ const SearchTickets = () => {
             <Select
               className="select-form"
               bordered={false}
-              defaultValue="Hà Nội"
+              defaultValue={from.name}
+              value={from._id}
+              onChange={(e) => handleChangeFrom(e)}
               suffixIcon={null}
               showSearch
               filterOption={filterOption}
-              options={provices}
+              options={renderProvince()}
             />
           </div>
         </div>
@@ -51,11 +55,13 @@ const SearchTickets = () => {
             <Select
               className="select-form"
               showSearch
-              defaultValue="Hà Nội"
+              defaultValue={to.name}
+              value={to._id}
+              onChange={(e) => handleChangeTo(e)}
               bordered={false}
               suffixIcon={null}
               filterOption={filterOption}
-              options={provices}
+              options={renderProvince()}
             />
           </div>
         </div>
@@ -72,6 +78,8 @@ const SearchTickets = () => {
                 suffixIcon={null}
                 allowClear={false}
                 format="DD-MM-YYYY"
+                value={date}
+                onChange={handleChangeDate}
               />
             </Space>
           </div>

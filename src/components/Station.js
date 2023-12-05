@@ -4,77 +4,86 @@ import { Input, Radio, Space } from 'antd'
 import { CompassFilled } from '@ant-design/icons'
 import '../scss/station.scss'
 
-const Station = () => {
-  const [value, setValue] = useState(1)
-  const onChange = (e) => {
-    console.log('radio checked', e.target.value)
-    setValue(e.target.value)
-  }
+const getPointInfo = (id, points) => {
+  const find = points.find((x) => x._id === id)
+  return find
+}
+
+const Station = ({
+  trip,
+  points,
+  pickedPoint,
+  handleChangePickedPoint,
+  droppedPoint,
+  handleChangeDroppedPoint
+}) => {
   return (
     <div className="pick-station">
       <Row>
-        <Col span={12}>
-          <div className="header-point">
-            <span>Điểm đón</span>
-          </div>
-          <Radio.Group onChange={onChange} value={value}>
-            <Space direction="vertical">
-              <Radio value={1}>
-                <div className="">
-                  <b>08:30 Vp Tân Bình</b>
-                  <div className="">
-                    <CompassFilled />
-                    <span>
-                      306A Hồng Lạc, Phường 11, Phường 11, Tân Bình, Hồ Chí Minh
-                    </span>
-                  </div>
-                </div>
-              </Radio>
-              <Radio value={2}>
-                <div className="">
-                  <b>08:30 Vp Tân Bình</b>
-                  <div className="">
-                    <CompassFilled />
-                    <span>
-                      306A Hồng Lạc, Phường 11, Phường 11, Tân Bình, Hồ Chí Minh
-                    </span>
-                  </div>
-                </div>
-              </Radio>
-            </Space>
-          </Radio.Group>
-        </Col>
-        <Col span={12}>
-          <div className="header-point">
-            <span>Điểm trả</span>
-          </div>
-          <Radio.Group onChange={onChange} value={value}>
-            <Space direction="vertical">
-              <Radio value={3}>
-                <div className="">
-                  <b>08:30 Vp Tân Bình</b>
-                  <div className="">
-                    <CompassFilled />
-                    <span>
-                      306A Hồng Lạc, Phường 11, Phường 11, Tân Bình, Hồ Chí Minh
-                    </span>
-                  </div>
-                </div>
-              </Radio>
-              <Radio value={4}>
-                <div className="">
-                  <b>08:30 Vp Tân Bình</b>
-                  <div className="">
-                    <CompassFilled />
-                    <span>
-                      306A Hồng Lạc, Phường 11, Phường 11, Tân Bình, Hồ Chí Minh
-                    </span>
-                  </div>
-                </div>
-              </Radio>
-            </Space>
-          </Radio.Group>
-        </Col>
+        {trip.points.map((point) => (
+          <>
+            <Col span={12}>
+              <div className="header-point">
+                <span>Điểm đón</span>
+              </div>
+              <Radio.Group onChange={handleChangePickedPoint}>
+                <Space direction="vertical">
+                  <Radio value={point._id}>
+                    <div className="">
+                      <b>
+                        {' '}
+                        {new Date(point.timePickUp).toLocaleTimeString(
+                          'en-US',
+                          {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: false
+                          }
+                        )}
+                      </b>
+                      <div className="">
+                        <CompassFilled />
+                        <span>
+                          {getPointInfo(point.PickUpPointId, points).address}
+                        </span>
+                      </div>
+                    </div>
+                  </Radio>
+                </Space>
+              </Radio.Group>
+            </Col>
+            <Col span={12}>
+              <div className="header-point">
+                <span>Điểm trả</span>
+              </div>
+              <Radio.Group onChange={handleChangeDroppedPoint}>
+                <Space direction="vertical">
+                  <Radio value={point._id}>
+                    <div className="">
+                      <b>
+                        {' '}
+                        {new Date(point.timeDropOff).toLocaleTimeString(
+                          'en-US',
+                          {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: false
+                          }
+                        )}
+                      </b>
+                      <div className="">
+                        <CompassFilled />
+                        <span>
+                          {getPointInfo(point.DropOffPointId, points).address}
+                        </span>
+                      </div>
+                    </div>
+                  </Radio>
+                </Space>
+              </Radio.Group>
+            </Col>
+          </>
+        ))}
       </Row>
     </div>
   )

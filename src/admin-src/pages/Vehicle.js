@@ -28,6 +28,7 @@ import SeatBooked from '../../components/Seat/SeatBooked'
 import Seat1 from '../../components/Seat/Seat1'
 import SeatBooking from '../../components/Seat/SeatBooking'
 import DetailsSeat from '../components/DetailsSeat'
+import { Hidden } from '@mui/material'
 
 const Vehicle = () => {
   const [open, setOpen] = useState(false)
@@ -76,6 +77,7 @@ const Vehicle = () => {
   }
 
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalVehicleOpen, setIsModalVehicleOpen] = useState(false)
   const [vehicleId, setVehicleId] = useState('')
   const showModal = (id) => {
     setIsModalOpen(true)
@@ -88,6 +90,29 @@ const Vehicle = () => {
     setIsModalOpen(false)
     setVehicleId('')
   }
+
+  const showModalEdit = () => {
+    setIsModalVehicleOpen(true)
+  }
+  const handleOkVehicle = () => {
+    setIsModalVehicleOpen(false)
+  }
+  const handleCancelVehicle = () => {
+    setIsModalVehicleOpen(false)
+  }
+
+  // const handleUpdateVehicle = async (values, idVehicle) => {
+  //   const data = {
+  //     id: idVehicle,
+  //     name: values.name,
+  //     type: values.type
+  //   }
+  //   await vehicleApi.update(data)
+  //   setIsModalVehicleOpen(false)
+  //   const vehicleList = await vehicleApi.getAll()
+  //   setVehicleList(vehicleList.data)
+  //   message.success('Cập nhật thông tin xe thành công')
+  // }
 
   const columns = [
     {
@@ -152,9 +177,83 @@ const Vehicle = () => {
         return (
           <Fragment>
             <div className="btn-action">
-              <button className="mr-3" onClick={() => {}}>
+              <button onClick={showModalEdit}>
                 <EditOutlined className="btn-edit" />
               </button>
+              <Modal
+                title="Edit Vehicle"
+                open={isModalVehicleOpen}
+                onOk={handleOkVehicle}
+                onCancel={handleCancelVehicle}
+                okButtonProps={{
+                  hidden: true,
+                  disabled: true
+                }}
+                okText=" "
+              >
+                <Form
+                  name="basic"
+                  labelCol={{
+                    span: 4
+                  }}
+                  wrapperCol={{
+                    span: 20
+                  }}
+                  style={{
+                    maxWidth: 600
+                  }}
+                  initialValues={{
+                    remember: true
+                  }}
+                  // onFinish={handleUpdateVehicle(item._id)}
+                  // onFinishFailed={onFinishFailed}
+                  autoComplete="off"
+                >
+                  <Form.Item
+                    label="Name"
+                    name="name"
+                    // onChange={handleChangeName}
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please input Name Station!'
+                      }
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="type"
+                    label="Type"
+                    rules={[
+                      {
+                        required: true
+                      }
+                    ]}
+                  >
+                    <Select
+                      placeholder="Select a option and change input text above"
+                      // options={renderPickProvince()}
+                    >
+                      <Option value="Giường nằm">Giường nằm</Option>
+                      <Option value="Limousine">Limousine</Option>
+                    </Select>
+                  </Form.Item>
+
+                  <Form.Item
+                    wrapperCol={{
+                      offset: 10,
+                      span: 24
+                    }}
+                  >
+                    <Button type="primary" htmlType="submit">
+                      Cập nhật
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </Modal>
+
               <Popconfirm
                 title="Delete the task"
                 description="Are you sure to delete this task?"

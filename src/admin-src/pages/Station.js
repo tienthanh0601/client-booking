@@ -90,13 +90,15 @@ const Station = () => {
     setStation(getStationId.data)
     setNameStation(getStationId.data.name)
     setAddressStation(getStationId.data.address)
+    setProvinceStation(getStationId.data.province)
     setIsEdit(true)
   }
   const handleUpdate = async () => {
     const data = {
       id: station._id,
       name: nameStation,
-      address: addressStation
+      address: addressStation,
+      province: provinceStation
     }
     await StationApi.update(data)
     const stationList = await StationApi.getAll()
@@ -327,7 +329,7 @@ const Station = () => {
           handleChangeAddress={handleChangeAddress}
           handleChangeProvince={handleChangeProvince}
           name={nameStation}
-          province={provinceStation}
+          provinceStation={provinceStation}
           address={addressStation}
           handleCloseEdit={handleCloseEdit}
         />

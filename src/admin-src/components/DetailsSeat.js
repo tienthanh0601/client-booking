@@ -1,9 +1,4 @@
-import {
-  DeleteOutlined,
-  FormOutlined,
-  MinusCircleOutlined,
-  PlusOutlined
-} from '@ant-design/icons'
+import { DeleteOutlined, FormOutlined } from '@ant-design/icons'
 import {
   Button,
   Col,
@@ -14,7 +9,6 @@ import {
   Popover,
   Row,
   Select,
-  Space,
   message
 } from 'antd'
 import { Option } from 'antd/es/mentions'
@@ -30,15 +24,6 @@ const DetailsSeat = ({ vehicleId }) => {
   // const [selectedItems, setSelectedItems] = useState([])
   // const [VehicleList, setVehicleList] = useState([])
 
-  useEffect(() => {
-    const fetchSeat = async () => {
-      const seatList = await seatApi.getSeatByVehicle(vehicleId)
-      console.log('list', seatList)
-      setSeatList(seatList.data)
-    }
-    fetchSeat()
-  }, [vehicleId])
-
   const handleAddSeat = async (values) => {
     const data = {
       vehicle: vehicleId,
@@ -47,9 +32,19 @@ const DetailsSeat = ({ vehicleId }) => {
       price: values.price
     }
     await seatApi.create(data)
-
+    const seatList = await seatApi.getSeatByVehicle(vehicleId)
+    setSeatList(seatList.data)
     message.success('Tạo ghế mới thành công')
   }
+  useEffect(() => {
+    const fetchSeat = async () => {
+      const seatList = await seatApi.getSeatByVehicle(vehicleId)
+      setSeatList(seatList.data)
+    }
+    fetchSeat()
+  }, [vehicleId])
+
+  const handleEditSeat = async () => {}
 
   const showDrawer = () => {
     setOpen(true)
@@ -112,8 +107,8 @@ const DetailsSeat = ({ vehicleId }) => {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="owner"
-                label="Owner"
+                name="type"
+                label="Type"
                 rules={[
                   {
                     required: true,
@@ -140,7 +135,7 @@ const DetailsSeat = ({ vehicleId }) => {
               >
                 <Select placeholder="Please choose the status">
                   <Option value={true}>Đã đặt</Option>
-                  <Option value={false}>chưa đặt</Option>
+                  <Option value={false}>Chưa đặt</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -167,27 +162,6 @@ const DetailsSeat = ({ vehicleId }) => {
     </div>
   )
 
-  const seats = [
-    { id: 1, name: 'A1', price: 500000, isBooked: false },
-    { id: 2, name: 'A2', price: 500000, isBooked: false },
-    { id: 3, name: 'A3', price: 500000, isBooked: false },
-    { id: 4, name: 'A4', price: 500.0, isBooked: false },
-    { id: 5, name: 'A5', price: 500.0, isBooked: true },
-    { id: 6, name: 'A6', price: 500.0, isBooked: false },
-    { id: 7, name: 'A7', price: 500.0, isBooked: false },
-    { id: 8, name: 'A8', price: 500.0, isBooked: false },
-    { id: 9, name: 'B1', price: 500.0, isBooked: true },
-    { id: 10, name: 'B2', isBooked: false },
-    { id: 11, name: 'B3', isBooked: false },
-    { id: 12, name: 'B4', isBooked: false },
-    { id: 13, name: 'B5', isBooked: false },
-    { id: 14, name: 'B6', isBooked: false },
-    { id: 10, name: 'B2', isBooked: false },
-    { id: 11, name: 'B3', isBooked: false },
-    { id: 12, name: 'B4', isBooked: false },
-    { id: 13, name: 'B5', isBooked: false }
-    // ...Thêm các ghế khác
-  ]
   const [form] = Form.useForm()
 
   return (
@@ -234,6 +208,7 @@ const DetailsSeat = ({ vehicleId }) => {
           ))}
         </div>
       </div>
+
       <div style={{ margin: '30px auto', width: '60%' }}>
         <h3>Thêm ghế cho xe</h3>
         <Form
@@ -242,8 +217,8 @@ const DetailsSeat = ({ vehicleId }) => {
           onFinish={handleAddSeat}
           hideRequiredMark
         >
-          <Row>
-            <Col span={6}>
+          <Row gutter={12}>
+            <Col span={12}>
               <Form.Item
                 name="name"
                 label="Name"
@@ -256,7 +231,7 @@ const DetailsSeat = ({ vehicleId }) => {
                 <Input></Input>
               </Form.Item>
             </Col>
-            <Col span={6}>
+            <Col span={12} gutter={4}>
               <Form.Item
                 name="price"
                 label="Price"
@@ -269,7 +244,7 @@ const DetailsSeat = ({ vehicleId }) => {
                 <Input></Input>
               </Form.Item>
             </Col>
-            <Col span={6}>
+            <Col span={12}>
               <Form.Item
                 name="type"
                 label="Type"

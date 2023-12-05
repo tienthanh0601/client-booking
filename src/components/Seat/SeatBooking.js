@@ -5,41 +5,8 @@ import '../../scss/seat.scss'
 import Wheel from './Wheel'
 import SeatBooked from './SeatBooked'
 
-const SeatBooking = () => {
+const SeatBooking = ({ seats, selectedSeats, toggleSeat }) => {
   const [color, setColor] = useState(false)
-
-  // Giả sử bạn có danh sách ghế từ API hoặc Redux store
-  const seats = [
-    { id: 1, name: 'A1', price: 500000, isBooked: false },
-    { id: 2, name: 'A2', price: 500000, isBooked: false },
-    { id: 3, name: 'A3', price: 500000, isBooked: false },
-    { id: 4, name: 'A4', price: 500.0, isBooked: false },
-    { id: 5, name: 'A5', price: 500.0, isBooked: true },
-    { id: 6, name: 'A6', price: 500.0, isBooked: false },
-    { id: 7, name: 'A7', price: 500.0, isBooked: false },
-    { id: 8, name: 'A8', price: 500.0, isBooked: false },
-    { id: 9, name: 'B1', price: 500.0, isBooked: true },
-    { id: 10, name: 'B2', isBooked: false },
-    { id: 11, name: 'B3', isBooked: false },
-    { id: 12, name: 'B4', isBooked: false },
-    { id: 13, name: 'B5', isBooked: false },
-    { id: 14, name: 'B6', isBooked: false },
-    { id: 10, name: 'B2', isBooked: false },
-    { id: 11, name: 'B3', isBooked: false },
-    { id: 12, name: 'B4', isBooked: false },
-    { id: 13, name: 'B5', isBooked: false }
-    // ...Thêm các ghế khác
-  ]
-
-  const [selectedSeats, setSelectedSeats] = useState([])
-
-  const toggleSeat = (seatId) => {
-    setColor(!color)
-    const updatedSeats = selectedSeats.includes(seatId)
-      ? selectedSeats.filter((id) => id !== seatId)
-      : [...selectedSeats, seatId]
-    setSelectedSeats(updatedSeats)
-  }
 
   const renderSeats = () => {
     return seats.map((seat) => (
@@ -49,11 +16,11 @@ const SeatBooking = () => {
         title={`Ghế : ${seat.name} + ${seat.price} VND`}
       >
         <button
-          key={seat.id}
+          key={seat._id}
           variant={seat.isBooked ? 'cursor: pointer' : 'outlined'}
           color={seat.isBooked ? 'error' : 'primary'}
           disabled={seat.isBooked}
-          onClick={() => toggleSeat(seat.id)}
+          onClick={() => toggleSeat(seat._id)}
           className="btn-seat"
           style={
             color === true
@@ -95,7 +62,9 @@ const SeatBooking = () => {
                       fontWeight: '700'
                     }}
                     key={seatId}
-                  >{`${seatId} ,`}</span>
+                  >
+                    {`${seats.find((x) => x._id === seatId).name} `}
+                  </span>
                 ))}
               </div>
             )}
