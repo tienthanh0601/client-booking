@@ -4,16 +4,16 @@ import Highlighter from 'react-highlight-words'
 import { Button, Input, Popconfirm, Space, Table } from 'antd'
 import ticketApi from '../../api/ticketApi'
 import pointApi from '../../api/PointApi'
-
-const getPointByID = (id, points) => {
-  const find = points.find((x) => x._id === id)
-  return find !== undefined ? find.name : ''
-}
+import { format } from 'date-fns'
+import seatApi from '../../api/seatApi'
 
 const Tickets = () => {
   // lấy tat cả tieket ra
   const [ticketList, setTicketList] = useState([])
   const [pointList, setPointList] = useState([])
+  const [seatList, setSeatList] = useState([])
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deletingItemId, setDeletingItemId] = useState(null)
   // tát cả point
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
@@ -25,6 +25,14 @@ const Tickets = () => {
       setTicketList(pointList.data)
     }
     fetchTicket()
+  }, [])
+
+  useEffect(() => {
+    const fetchSeat = async () => {
+      const seatList = await seatApi.getAll()
+      setSeatList(seatList.data)
+    }
+    fetchSeat()
   }, [])
 
   useEffect(() => {
@@ -146,78 +154,120 @@ const Tickets = () => {
         text
       )
   })
+
+  const getPointById = (id, pointList) => {
+    console.log('first', id, pointList)
+    const foundPoint = pointList.find((point) => point._id === id)
+    console.log(foundPoint)
+    return foundPoint ? foundPoint.address : ''
+  }
+
+  const getSeatNameById = (id, seatList) => {
+    const foundSeat = seatList.find((seat) => seat._id === id)
+    return foundSeat ? foundSeat.name : ''
+  }
+
+  const deleteTicket = async (ticketId) => {
+    try {
+      // Gọi API xóa vé với ID tương ứng
+      await ticketApi.remove(ticketId)
+
+      // Cập nhật danh sách vé sau khi xóa
+      const updatedTicketList = ticketList.filter(
+        (ticket) => ticket._id !== ticketId
+      )
+      setTicketList(updatedTicketList)
+    } catch (error) {
+      console.error('Error deleting ticket:', error)
+    } finally {
+      // Đặt lại trạng thái
+      setConfirmDelete(false)
+      setDeletingItemId(null)
+    }
+  }
+  const handleConfirmDelete = async (ticketId) => {
+    setConfirmDelete(true)
+    setDeletingItemId(ticketId)
+  }
+
+  // Xử lý sự kiện hủy xác nhận xóa
+  const handleCancelDelete = () => {
+    setConfirmDelete(false)
+    setDeletingItemId(null)
+  }
+
+  const vnd = 'VND'
   const columns = [
     {
       title: 'Mã vé',
       dataIndex: '_id',
-      key: '_id',
-      width: '10%',
-      ...getColumnSearchProps('name')
+      key: '_id'
     },
     {
-      title: 'Name',
+      title: 'Tên',
       dataIndex: 'name',
       key: 'name',
-      width: '10%',
       ...getColumnSearchProps('name')
     },
     {
-      title: 'Phone',
+      title: 'Điện thoại',
       dataIndex: 'phone',
       key: 'phone',
-      width: '10%',
-      ...getColumnSearchProps('address'),
-      sorter: (a, b) => a.address.length - b.address.length,
-      sortDirections: ['descend', 'ascend']
+      ...getColumnSearchProps('phone')
     },
     {
       title: 'Email',
       dataIndex: 'email',
-      key: 'from',
-      width: '10%'
+      key: 'email',
+
+      ...getColumnSearchProps('email')
     },
     {
-      title: 'From',
-      dataIndex: 'pickedPoint',
-      key: 'from',
-      width: '10%',
-      render: (text, record) => getPointByID(record.pickedPoint, pointList).name
-    },
-    {
-      title: 'To',
-      dataIndex: 'droppedPoint',
-      key: 'to',
-      width: '10%'
-    },
-    {
-      title: 'Day',
-      dataIndex: 'day',
-      key: 'day',
-      width: '10%'
-    },
-    {
-      title: 'Total Amount',
+      title: 'Tổng tiền',
       dataIndex: 'total',
       key: 'total',
-      width: '10%'
+
+      render: (total) => (
+        <span>
+          {total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.')} {vnd}
+        </span>
+      )
     },
     {
-      title: 'Number Seats',
+      title: 'Tên ghế',
       dataIndex: 'seatId',
       key: 'seatId',
-      width: '10%'
+      width: '10%',
+      render: (seatId) => getSeatNameById(seatId, seatList)
     },
     {
-      title: 'Point',
-      dataIndex: 'point',
-      key: 'point',
-      width: '10%'
+      title: 'Điểm đón',
+      dataIndex: 'pickedPoint',
+      key: 'pickedPoint',
+      render: (pickedPoint, record) => (
+        <span>
+          {format(new Date(record.timePickUp), 'HH:mm')} -{' '}
+          {getPointById(pickedPoint, pointList)}
+        </span>
+      )
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      width: '10%'
+      title: 'Điểm trả',
+      dataIndex: 'droppedPoint',
+      key: 'to',
+      render: (droppedPoint, record) => (
+        <span>
+          {format(new Date(record.timeDropOff), 'HH:mm')} -{' '}
+          {getPointById(droppedPoint, pointList)}
+        </span>
+      )
+    },
+    {
+      title: 'Ngày mua',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+
+      render: (createdAt) => format(new Date(createdAt), 'dd/MM/yyyy HH:mm')
     },
     {
       title: 'Action',
@@ -242,13 +292,16 @@ const Tickets = () => {
               <Popconfirm
                 placement="topLeft"
                 title={'Bạn có muốn xóa tài khoản này'}
-                // onConfirm={() => {
-                //   dispatch(deleteUserAction(item.id))
-                // }}
-                // okText="Yes"
-                // cancelText="No"
+                onConfirm={() => deleteTicket(item._id)}
+                onCancel={handleCancelDelete}
+                okText="Yes"
+                cancelText="No"
+                visible={confirmDelete && deletingItemId === item._id}
               >
-                <button className="text-red-700">
+                <button
+                  className="text-red-700"
+                  onClick={() => handleConfirmDelete(item._id)}
+                >
                   <DeleteOutlined className="btn-delete" />
                 </button>
               </Popconfirm>
@@ -260,26 +313,13 @@ const Tickets = () => {
   ]
   return (
     <div className="">
-      <Table columns={columns} dataSource={ticketList} />
-      {/* <table>
-        <tr>
-          <th>Mã ghế</th>
-          <th>name</th>
-          <th>Email</th>
-          <th>phone</th>
-          <th>Gia tiền</th>
-          <th>Ghế ngồi</th>
-          <th>điểm đón / Trả</th>
-        </tr>
-
-        <tr>
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-          <td></td>
-          <td>3</td>
-        </tr>
-      </table> */}
+      <Table
+        columns={columns}
+        scroll={{
+          x: 1300
+        }}
+        dataSource={ticketList}
+      />
     </div>
   )
 }

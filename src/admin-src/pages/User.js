@@ -204,7 +204,7 @@ const User = () => {
               title: 'Admin'
             },
             {
-              title: 'User'
+              title: 'Quản lý người dùng'
             }
           ]}
         />

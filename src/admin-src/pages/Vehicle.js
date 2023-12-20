@@ -174,6 +174,7 @@ const Vehicle = () => {
       title: 'Action',
 
       render: (text, item) => {
+        console.log(item)
         return (
           <Fragment>
             <div className="btn-action">
@@ -203,7 +204,9 @@ const Vehicle = () => {
                     maxWidth: 600
                   }}
                   initialValues={{
-                    remember: true
+                    remember: true,
+                    name: item.name,
+                    type: item.type
                   }}
                   // onFinish={handleUpdateVehicle(item._id)}
                   // onFinishFailed={onFinishFailed}
@@ -282,7 +285,7 @@ const Vehicle = () => {
             title: 'Admin'
           },
           {
-            title: 'Vehicle'
+            title: 'Quản lý xe'
           }
         ]}
       />

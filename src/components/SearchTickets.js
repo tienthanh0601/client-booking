@@ -3,6 +3,7 @@ import { Select, DatePicker, Space } from 'antd'
 import { BsFillRecordCircleFill, BsFillCalendarWeekFill } from 'react-icons/bs'
 import { HiLocationMarker } from 'react-icons/hi'
 import '../scss/searchticket.scss'
+import Loading from './Loading'
 
 const SearchTickets = ({
   handleChangeDate,
@@ -12,7 +13,7 @@ const SearchTickets = ({
   to,
   from,
   provinceList,
-  date,
+  date
 }) => {
   // Filter `option.label` match the user type `input`
   const filterOption = (input, option) =>
@@ -84,6 +85,7 @@ const SearchTickets = ({
             </Space>
           </div>
         </div>
+
         <button onClick={handleSearch} className="btn-search">
           Tìm kiếm
         </button>

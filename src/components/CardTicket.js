@@ -5,16 +5,35 @@ import '../scss/account.scss'
 import { AiFillCloseCircle, AiOutlineEyeInvisible } from 'react-icons/ai'
 import ticketApi from '../api/ticketApi'
 import { useSelector } from 'react-redux'
+import { format } from 'date-fns'
+import seatApi from '../api/seatApi'
+import pointApi from '../api/PointApi'
 const CardTicket = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [ticketList, setTicketList] = useState([])
   const userId = useSelector((state) => state.user.id)
-  console.log('id', userId)
+  const [seatList, setSeatList] = useState([])
+  const [pointList, setPointList] = useState([])
+  useEffect(() => {
+    const fetchPoint = async () => {
+      const points = await pointApi.getAll()
+      setPointList(points.data)
+    }
+    fetchPoint()
+  }, [])
+
+  useEffect(() => {
+    const fetchSeat = async () => {
+      const seatList = await seatApi.getAll()
+      setSeatList(seatList.data)
+    }
+    fetchSeat()
+  }, [])
 
   useEffect(() => {
     const fetchPoint = async () => {
       const ticketList = await ticketApi.getTicketsById(userId)
-      console.log(ticketList)
+      console.log('ticket ', ticketList.datacreatedAt)
       setTicketList(ticketList.data)
     }
     fetchPoint()
@@ -28,6 +47,18 @@ const CardTicket = () => {
   }
   const handleCancel = () => {
     setIsModalOpen(false)
+  }
+  const vnd = 'VND'
+
+  const getSeatNameById = (id, seatList) => {
+    const foundSeat = seatList.find((seat) => seat._id === id)
+    return foundSeat ? foundSeat.name : ''
+  }
+  const getPointById = (id, pointList) => {
+    console.log('first', id, pointList)
+    const foundPoint = pointList.find((point) => point._id === id)
+    console.log(foundPoint)
+    return foundPoint ? foundPoint.address : ''
   }
   const columns = [
     {
@@ -106,13 +137,13 @@ const CardTicket = () => {
     },
     {
       title: 'Mã vé',
-      width: 100,
+      width: 55,
       dataIndex: '_id',
       key: '_id'
     },
     {
       title: 'Name',
-      width: 50,
+      width: 40,
       dataIndex: 'name',
       key: 'name'
     },
@@ -120,36 +151,64 @@ const CardTicket = () => {
       title: 'Phone',
       dataIndex: 'phone',
       key: '1',
-      width: 50
+      width: 40
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: '2',
-      width: 100
+      width: 50
     },
     {
       title: 'Số tiền',
       dataIndex: 'total',
       key: '3',
-      width: 70
+      width: 40,
+      render: (total) => (
+        <span>
+          {total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.')} {vnd}
+        </span>
+      )
     },
     {
       title: 'Ghế',
       dataIndex: 'seatId',
       key: '4',
-      width: 50
+      width: 40,
+      render: (seatId) => getSeatNameById(seatId, seatList)
+    },
+    {
+      title: 'Điểm đón',
+      dataIndex: 'pickedPoint',
+      key: 'pickedPoint',
+      width: 100,
+      render: (pickedPoint, record) => (
+        <span>
+          {format(new Date(record.timePickUp), 'HH:mm')} -{' '}
+          {getPointById(pickedPoint, pointList)}
+        </span>
+      )
+    },
+    {
+      title: 'Điểm trả',
+      dataIndex: 'droppedPoint',
+      key: 'to',
+      width: 100,
+      render: (droppedPoint, record) => (
+        <span>
+          {format(new Date(record.timeDropOff), 'HH:mm')} -{' '}
+          {getPointById(droppedPoint, pointList)}
+        </span>
+      )
+    },
+    {
+      title: 'Ngày Đặt',
+      dataIndex: 'createdAt',
+      key: '5',
+      width: 50,
+      render: (createdAt) => format(new Date(createdAt), ' HH:mm dd/MM/yyyy')
     }
   ]
-  const data = []
-  for (let i = 0; i < 10; i++) {
-    data.push({
-      key: i,
-      name: `Edward ${i}`,
-      age: 2,
-      address: `London => Park no. ${i}`
-    })
-  }
   return (
     <div className="wrapper-order-ticket">
       <div className="container-ticket">

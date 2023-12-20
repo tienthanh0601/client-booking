@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
+
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useNavigate } from 'react-router-dom'
 import {
+  Breadcrumb,
   Button,
   Col,
   DatePicker,
@@ -10,13 +12,15 @@ import {
   Row,
   Select,
   TimePicker,
-  message
+  message,
+  notification
 } from 'antd'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import pointApi from '../../api/PointApi'
 import StationApi from '../../api/StationApi'
 import vehicleApi from '../../api/VehicleApi'
 import tripApi from '../../api/tripApi'
+import { format } from 'date-fns'
 const { Option } = Select
 dayjs.extend(customParseFormat)
 
@@ -52,7 +56,31 @@ const AddTrip = () => {
     fetchVehicle()
   }, [])
 
+  const [messageApi, contextHolder] = message.useMessage()
+  const key = 'updatable'
+
   const handleCreate = async (values) => {
+    messageApi.open({
+      key,
+      type: 'loading',
+      content: 'Loading...'
+    })
+
+    // Your existing code...
+
+    messageApi.open({
+      key,
+      type: 'success',
+      content: 'Loaded!',
+      duration: 2
+    })
+    if (values.from === values.to) {
+      notification.error({
+        message: 'Lỗi',
+        description: 'Điểm xuất phát và điểm đến không thể giống nhau.'
+      })
+      return // Kết thúc hàm nếu có lỗi
+    }
     const data = {
       from: values.from,
       to: values.to,
@@ -65,7 +93,7 @@ const AddTrip = () => {
     console.log(data)
     await tripApi.create(data)
     navigate('/admin/trip')
-    message.success('Tạo tài khoản mới thành công')
+    message.success('Tạo tài chuyến xe mới thành công')
   }
 
   const renderPickPoint = () => {
@@ -88,6 +116,20 @@ const AddTrip = () => {
 
   return (
     <div className="add-trip">
+      <Breadcrumb
+        style={{ marginBottom: '24px' }}
+        items={[
+          {
+            title: 'Admin'
+          },
+          {
+            title: <a href="trip">Danh sách chuyến xe</a>
+          },
+          {
+            title: 'Tạo chuyến xe mới'
+          }
+        ]}
+      />
       <Form form={form} name="info-trip" onFinish={handleCreate}>
         <Row gutter={[16, 24]}>
           <Col className="gutter-row" span={8}>
@@ -155,7 +197,7 @@ const AddTrip = () => {
               name="day"
               label="Chọn ngày khởi hành"
             >
-              <DatePicker />
+              <DatePicker format="DD-MM-YYYY" />
             </Form.Item>
           </Col>
           <Col className="gutter-row" span={8}>

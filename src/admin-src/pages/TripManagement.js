@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { Breadcrumb, Button, Popconfirm, Table, message } from 'antd'
 import ModalListPoint from '../components/ModalListPoint'
-import { BsBusFrontFill } from 'react-icons/bs'
 import tripApi from '../../api/tripApi'
 import StationApi from '../../api/StationApi'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import vehicleApi from '../../api/VehicleApi'
+import pointApi from '../../api/PointApi'
 dayjs.extend(customParseFormat)
 const TripManagement = () => {
   const navigate = useNavigate()
@@ -19,30 +19,32 @@ const TripManagement = () => {
 
   const [tripList, setTripList] = useState([])
   const [stations, setStations] = useState([])
+  const [points, setPoints] = useState([])
+  const [vehicleList, setVehicleList] = useState([])
+
+  useEffect(() => {
+    const fetchVehicle = async () => {
+      const vehicleList = await vehicleApi.getAll()
+      setVehicleList(vehicleList.data)
+    }
+    fetchVehicle()
+  }, [])
+
+  useEffect(() => {
+    const fetchPoint = async () => {
+      const points = await pointApi.getAll()
+      setPoints(points.data)
+    }
+    fetchPoint()
+  }, [])
 
   useEffect(() => {
     const fetchTrip = async () => {
       const tripList = await tripApi.getAll()
       const responseGetStations = await StationApi.getAll()
-      const responseGetVehicle = await vehicleApi.getAll()
-      console.log(tripList.allTrip)
+      // console.log(tripList.allTrip)
       setTripList(tripList.allTrip)
       setStations(responseGetStations.data)
-
-      const updatedTripList = tripList.allTrip.map((trip) => {
-        const station = responseGetStations.data.find(
-          (s) => s.id === trip.stationId
-        )
-        const vehicles = responseGetVehicle.data.find(
-          (s) => s.id === trip.vehicleId
-        )
-        return {
-          ...trip,
-          day: dayjs(trip.day).format('DD/MM/YYYY')
-        }
-      })
-
-      setTripList(updatedTripList)
     }
     fetchTrip()
   }, [tripList])
@@ -166,52 +168,114 @@ const TripManagement = () => {
   //     )
   // })
 
+  const getVehicleById = (id, vehicleList) => {
+    const foundVehicle = vehicleList.find((vehicle) => vehicle._id === id)
+    console.log('point : ', foundVehicle)
+    return foundVehicle ? foundVehicle.name : ''
+  }
+
+  const getPointsName = (pointId) => {
+    const point = points.find((point) => point._id === pointId)
+    return point ? point.name : ''
+  }
+
+  const getPointsAddress = (pointId) => {
+    const point = points.find((point) => point._id === pointId)
+    return point ? point.address : ''
+  }
+
+  const formatTime = (time) => {
+    return time ? dayjs(time).format('HH:mm') : ''
+  }
+
   const columns = [
     {
-      title: 'From Station',
+      title: 'Điểm đi',
       dataIndex: 'from',
       key: 'from',
-      width: '10%'
+      width: '10%',
+      render: (fromStationId) => {
+        const station = stations.find(
+          (station) => station._id === fromStationId
+        )
+        return station ? station.name : ''
+      }
     },
     {
-      title: 'To Station',
+      title: 'Điểm đến',
       dataIndex: 'to',
       key: 'to',
-      width: '10%'
+      width: '10%',
+      render: (toStationId) => {
+        const station = stations.find((station) => station._id === toStationId)
+        return station ? station.name : ''
+      }
     },
     {
-      title: 'Day',
+      title: 'Ngày đi',
       dataIndex: 'day',
       key: 'day',
-      width: '10%'
+      width: '10%',
+      render: (day) => dayjs(day).format('DD/MM/YYYY')
     },
-
     {
-      title: 'Vehicle',
+      title: 'Giờ đi',
+      dataIndex: 'timeStart',
+      key: 'timeStart',
+      width: '10%',
+      render: (timeStart) => dayjs(timeStart).format('HH:mm')
+    },
+    {
+      title: 'Giờ đến',
+      dataIndex: 'timeEnd',
+      key: 'timeEnd',
+      width: '10%',
+      render: (timeEnd) => dayjs(timeEnd).format('HH:mm')
+    },
+    {
+      title: 'Tên xe',
       dataIndex: 'vehicle',
       key: 'vehicle',
-      width: '10%'
+      width: '10%',
+      render: (seatId) => getVehicleById(seatId, vehicleList)
+    },
+    {
+      title: 'Điểm đón',
+      dataIndex: 'points',
+      key: 'pickupPoints',
+      width: '30%',
+      render: (points) => (
+        <Fragment>
+          {points.map((point, index) => (
+            <div key={index}>
+              <p>
+                <strong>Điểm đón:</strong>
+                <br />
+                <b style={{ color: 'blue' }}>
+                  {formatTime(point.timePickUp)}
+                </b>{' '}
+                -{getPointsName(point.PickUpPointId)} -
+                {getPointsAddress(point.PickUpPointId)}
+              </p>
+              <p>
+                <strong>Điểm trả:</strong>
+                <br />
+                <b style={{ color: 'red' }}>{formatTime(point.timeDropOff)} </b>
+                -{getPointsName(point.DropOffPointId)} -
+                {getPointsAddress(point.DropOffPointId)}
+              </p>
+            </div>
+          ))}
+        </Fragment>
+      )
     },
 
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      width: '10%'
-    },
-
-    {
-      title: 'Chi tiết vé',
-      render: () => {
-        return (
-          <Fragment>
-            <div>
-              <ModalListPoint />
-            </div>
-          </Fragment>
-        )
-      },
-      width: '10%'
+      width: '10%',
+      render: () => <span>Đang chạy</span>
     },
     {
       title: 'Action',
@@ -226,14 +290,16 @@ const TripManagement = () => {
                 <EditOutlined className="btn-edit" />
               </button>
               <Popconfirm
-                title="Delete the task"
-                description="Are you sure to delete this task?"
+                placement="topLeft"
+                title="Bạn có muốn xóa chuyến xe này?"
                 onConfirm={() => handleDelete(item._id)}
                 okText="Yes"
                 cancelText="No"
-                onCancel={cancel}
               >
-                <button>
+                <button
+                  className="text-red-700"
+                  // onClick={() => handleConfirmDelete(item._id)}
+                >
                   <DeleteOutlined className="btn-delete" />
                 </button>
               </Popconfirm>
@@ -253,7 +319,7 @@ const TripManagement = () => {
             title: 'Admin'
           },
           {
-            title: 'Trip'
+            title: 'Danh sách chuyến xe'
           }
         ]}
       />
@@ -266,7 +332,13 @@ const TripManagement = () => {
       >
         Thêm chuyến xe
       </Button>
-      <Table columns={columns} dataSource={tripList} />
+      <Table
+        columns={columns}
+        scroll={{
+          x: 1300
+        }}
+        dataSource={tripList}
+      />
     </div>
   )
 }

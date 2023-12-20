@@ -7,7 +7,7 @@ import StationApi from '../api/StationApi'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { BsFillRecordCircleFill } from 'react-icons/bs'
 import { HiLocationMarker } from 'react-icons/hi'
-import { Button, message } from 'antd'
+import { Alert, Button, message, notification } from 'antd'
 import SelectTrip from '../components/SelectTrip'
 import vehicleApi from '../api/VehicleApi'
 import seatApi from '../api/seatApi'
@@ -17,6 +17,7 @@ import provinceApi from '../api/provinceApi'
 import pointApi from '../api/PointApi'
 import ticketApi from '../api/ticketApi'
 import { useSelector } from 'react-redux'
+import { format } from 'date-fns'
 
 const calculateDuration = (timeStart, timeEnd) => {
   const start = new Date(timeStart)
@@ -108,12 +109,37 @@ const Search = () => {
     fetchPoints()
   }, [])
 
+  const [messageApi, contextHolder] = message.useMessage()
+  const key = 'updatable'
+
   const handleSearch = async () => {
+    messageApi.open({
+      key,
+      type: 'loading',
+      content: 'Loading...'
+    })
+
+    // Your existing code...
+
+    messageApi.open({
+      key,
+      type: 'success',
+      content: 'Loaded!',
+      duration: 2
+    })
+    if (from._id === to._id) {
+      notification.error({
+        message: 'Lỗi',
+        description: 'Điểm xuất phát và điểm đến không thể giống nhau.'
+      })
+      return // Kết thúc hàm nếu có lỗi
+    }
     const data = {
       fromId: from._id,
       toId: to._id,
-      date: date.$d
+      date: format(new Date(date.$d), 'yyyy/MM/dd')
     }
+    console.log('first', data.date)
     const response = await tripApi.search(data)
     setTrips(response.data)
   }
@@ -146,17 +172,19 @@ const Search = () => {
   // hamf called api vieet o day
   const handleSubmitTicket = async () => {
     const data = {
-      pickedPoint,
-      droppedPoint,
+      pickedPoint: pickedPoint.pickUpPointId,
+      droppedPoint: droppedPoint.DropOffPointId,
+      timePickUp: pickedPoint.timePickUp,
+      timeDropOff: droppedPoint.timeDropOff,
       email,
       phone,
       name,
-      tripSelected,
+      trip: tripSelected,
       user: userId,
       seats: selectedSeats,
       total: seats[0].price * selectedSeats.length
     }
-    console.log('data :', data)
+    console.log('data 12 :', data)
     await ticketApi.create(data)
     message.success('Đặt vé thành công thành công')
     navigate('/')
@@ -166,7 +194,7 @@ const Search = () => {
 
   const [selectedSeats, setSelectedSeats] = useState([])
   // seats: đây là danh sách ghế được user cjonj
-  // total: coong thuc sex laf: (gia cuar 1 ghe)
+  // total: coong thuc se laf: (gia cua 1 ghe)
   //vis duj cai pickedPoint , dropped point tuowng tu
 
   const [pickedPoint, setPickedPoint] = useState('')
@@ -186,6 +214,7 @@ const Search = () => {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [name, setName] = useState('')
+  const [loading, setLoading] = React.useState(false)
 
   const handleChangeEmail = (e) => {
     setEmail(e.target.value)
@@ -273,12 +302,18 @@ const Search = () => {
                   <div className="divide"></div>
                   <div className="description-trip">
                     <div className="">
-                      <span className="text-price"></span>
+                      <span className="text-price">
+                        <span className="fz">
+                          {' '}
+                          {dayjs(trip.day).format('DD-MM-YYYY')}
+                        </span>{' '}
+                      </span>
                       <span className="text-ver">
                         {getVehicleById(trip.vehicle, vehicles).type}
                       </span>
                       <span className="text-price">
-                        {countSeatEmpty(getSeatsById(trip.vehicle, seats))} ghế
+                        {' '}
+                        {countSeatEmpty(getSeatsById(trip.vehicle, seats))} Ghế
                         trống
                       </span>
                     </div>

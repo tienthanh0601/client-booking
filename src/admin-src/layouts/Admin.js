@@ -21,7 +21,7 @@ const Admin = () => {
     <div className="admin-container">
       <Layout>
         <Sider
-          style={{ height: '100vh' }}
+          style={{ minHeight: '100vh' }}
           trigger={null}
           collapsible
           collapsed={collapsed}
@@ -78,6 +78,11 @@ const Admin = () => {
                 key: '/admin/province',
                 icon: <UploadOutlined />,
                 label: 'Quản lý thành phố'
+              },
+              {
+                key: '/',
+                icon: <UploadOutlined />,
+                label: 'Website'
               }
             ]}
           />

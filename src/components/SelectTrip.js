@@ -4,7 +4,7 @@ import Station from './Station'
 import AddInfoTickets from './AddInfoTickets'
 import SelectSeats from './Seat/SelectSeats'
 
-const  SelectTrip = ({
+const SelectTrip = ({
   seats,
   trip,
   points,

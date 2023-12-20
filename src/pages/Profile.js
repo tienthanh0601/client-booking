@@ -7,8 +7,8 @@ import AccoutUser from '../components/AccoutUser'
 import CardTicket from '../components/CardTicket'
 
 const Profile = () => {
-  const [showEdit, setShowEdit] = useState(false)
-  const [showTicket, setShowTicket] = useState(true)
+  const [showEdit, setShowEdit] = useState(true)
+  const [showTicket, setShowTicket] = useState(false)
 
   const showCard = () => {
     setShowEdit(false)

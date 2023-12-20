@@ -3,7 +3,7 @@ import React from 'react'
 
 const Loading = ({ children, isLoading }) => {
   return (
-    <Spin spinning={isLoading} delay={500}>
+    <Spin spinning={isLoading} >
       {children}
     </Spin>
   )

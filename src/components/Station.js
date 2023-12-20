@@ -26,61 +26,59 @@ const Station = ({
               <div className="header-point">
                 <span>Điểm đón</span>
               </div>
-              <Radio.Group onChange={handleChangePickedPoint}>
-                <Space direction="vertical">
-                  <Radio value={point._id}>
-                    <div className="">
-                      <b>
-                        {' '}
-                        {new Date(point.timePickUp).toLocaleTimeString(
-                          'en-US',
-                          {
-                            hour: 'numeric',
-                            minute: 'numeric',
-                            hour12: false
-                          }
-                        )}
-                      </b>
-                      <div className="">
-                        <CompassFilled />
-                        <span>
-                          {getPointInfo(point.PickUpPointId, points).address}
-                        </span>
-                      </div>
-                    </div>
-                  </Radio>
-                </Space>
-              </Radio.Group>
+              <Radio
+                onChange={handleChangePickedPoint}
+                value={{
+                  pickUpPointId: point.PickUpPointId,
+                  timePickUp: point.timePickUp
+                }}
+              >
+                <div className="">
+                  <b>
+                    {' '}
+                    {new Date(point.timePickUp).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: false
+                    })}
+                  </b>
+                  <div className="">
+                    <CompassFilled />
+                    <span>
+                      {getPointInfo(point.PickUpPointId, points).address}
+                    </span>
+                  </div>
+                </div>
+              </Radio>
             </Col>
             <Col span={12}>
               <div className="header-point">
                 <span>Điểm trả</span>
               </div>
-              <Radio.Group onChange={handleChangeDroppedPoint}>
-                <Space direction="vertical">
-                  <Radio value={point._id}>
-                    <div className="">
-                      <b>
-                        {' '}
-                        {new Date(point.timeDropOff).toLocaleTimeString(
-                          'en-US',
-                          {
-                            hour: 'numeric',
-                            minute: 'numeric',
-                            hour12: false
-                          }
-                        )}
-                      </b>
-                      <div className="">
-                        <CompassFilled />
-                        <span>
-                          {getPointInfo(point.DropOffPointId, points).address}
-                        </span>
-                      </div>
-                    </div>
-                  </Radio>
-                </Space>
-              </Radio.Group>
+              <Radio
+                onChange={handleChangeDroppedPoint}
+                value={{
+                  DropOffPointId: point.DropOffPointId,
+                  timeDropOff: point.timeDropOff
+                }}
+              >
+                <div className="">
+                  <b>
+                    {' '}
+                    {new Date(point.timeDropOff).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: false
+                    })}
+                  </b>
+                  <div className="">
+                    <CompassFilled />
+                    <span>
+                      {getPointInfo(point.DropOffPointId, points).address}
+                    </span>
+                  </div>
+                </div>
+              </Radio>
             </Col>
           </>
         ))}
